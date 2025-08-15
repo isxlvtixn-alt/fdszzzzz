@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, Copy, Check } from 'lucide-react';
-import { generateScramble } from '@/lib/scramble-generator';
+import { generateEnhancedScramble } from '@/lib/enhanced-scramble-generator';
 import { toast } from 'sonner';
 
 interface ScrambleDisplayProps {
@@ -15,7 +15,7 @@ export const ScrambleDisplay = ({ cubeType, scramble, onScrambleChange }: Scramb
   const [copied, setCopied] = useState(false);
 
   const handleNewScramble = () => {
-    const newScramble = generateScramble(cubeType);
+    const newScramble = generateEnhancedScramble(cubeType);
     onScrambleChange(newScramble);
     toast.success('New scramble generated!');
   };

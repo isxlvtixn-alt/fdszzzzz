@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Trash2, RotateCcw } from 'lucide-react';
-import { CUBE_TYPES } from '@/lib/scramble-generator';
+import { CUBE_EVENTS } from '@/lib/enhanced-scramble-generator';
 import { toast } from 'sonner';
 
 interface SessionManagerProps {
@@ -54,7 +54,7 @@ export const SessionManager = ({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {CUBE_TYPES.map((type) => (
+              {CUBE_EVENTS.map((type) => (
                 <SelectItem key={type.id} value={type.id}>
                   {type.name}
                 </SelectItem>

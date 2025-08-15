@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Timer } from '@/components/Timer';
 import { ScrambleDisplay } from '@/components/ScrambleDisplay';
-import { Statistics } from '@/components/Statistics';
+import { AdvancedStatistics } from '@/components/AdvancedStatistics';
 import { SessionManager } from '@/components/SessionManager';
 import { TimesList } from '@/components/TimesList';
-import { generateScramble } from '@/lib/scramble-generator';
+import { CubeVisualization } from '@/components/CubeVisualization';
+import { TimerSettings } from '@/components/TimerSettings';
+import { generateEnhancedScramble } from '@/lib/enhanced-scramble-generator';
+import { TimerSettings as TimerSettingsType } from '@/hooks/useTimer';
 import { toast } from 'sonner';
 
 const Index = () => {
@@ -12,17 +15,22 @@ const Index = () => {
   const [currentSession, setCurrentSession] = useState('Session 1');
   const [cubeType, setCubeType] = useState('3x3');
   const [scramble, setScramble] = useState('');
-  const [useInspection, setUseInspection] = useState(false);
+  const [timerSettings, setTimerSettings] = useState<TimerSettingsType>({
+    useInspection: false,
+    inspectionTime: 15,
+    stackmatMode: false,
+    hideTimeWhileSolving: false,
+  });
 
   // Generate initial scramble
   useEffect(() => {
-    setScramble(generateScramble(cubeType));
+    setScramble(generateEnhancedScramble(cubeType));
   }, [cubeType]);
 
   const handleTimeRecord = (time: number) => {
     setTimes(prev => [...prev, time]);
     // Generate new scramble after each solve
-    setScramble(generateScramble(cubeType));
+    setScramble(generateEnhancedScramble(cubeType));
     toast.success('Time recorded!');
   };
 
@@ -33,7 +41,11 @@ const Index = () => {
 
   const handleCubeTypeChange = (newCubeType: string) => {
     setCubeType(newCubeType);
-    setScramble(generateScramble(newCubeType));
+    setScramble(generateEnhancedScramble(newCubeType));
+  };
+
+  const handleTimerSettingsChange = (newSettings: Partial<TimerSettingsType>) => {
+    setTimerSettings(prev => ({ ...prev, ...newSettings }));
   };
 
   const handleClearSession = () => {
@@ -59,12 +71,13 @@ const Index = () => {
         </div>
 
         {/* Main Timer Section */}
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid lg:grid-cols-4 gap-6">
           {/* Left Column - Timer and Scramble */}
           <div className="lg:col-span-2 space-y-6">
             <Timer 
               onTimeRecord={handleTimeRecord}
-              useInspection={useInspection}
+              settings={timerSettings}
+              onSettingsChange={handleTimerSettingsChange}
             />
             
             <ScrambleDisplay
@@ -74,9 +87,22 @@ const Index = () => {
             />
           </div>
 
+          {/* Middle Column - Cube Visualization */}
+          <div className="space-y-6">
+            <CubeVisualization
+              scramble={scramble}
+              cubeType={cubeType}
+            />
+            
+            <TimerSettings
+              settings={timerSettings}
+              onSettingsChange={handleTimerSettingsChange}
+            />
+          </div>
+
           {/* Right Column - Statistics and Controls */}
           <div className="space-y-6">
-            <Statistics 
+            <AdvancedStatistics 
               times={times}
               currentSession={currentSession}
             />

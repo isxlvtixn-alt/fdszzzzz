@@ -1,116 +1,23 @@
-import { useState, useEffect, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { formatTime } from '@/lib/timer-utils';
-
-type TimerState = 'ready' | 'inspection' | 'running' | 'stopped';
+import { useTimer, TimerSettings } from '@/hooks/useTimer';
 
 interface TimerProps {
   onTimeRecord: (time: number) => void;
-  useInspection?: boolean;
-  inspectionTime?: number;
+  settings: TimerSettings;
+  onSettingsChange: (settings: Partial<TimerSettings>) => void;
 }
 
-export const Timer = ({ onTimeRecord, useInspection = false, inspectionTime = 15 }: TimerProps) => {
-  const [time, setTime] = useState(0);
-  const [inspectionTimeLeft, setInspectionTimeLeft] = useState(inspectionTime);
-  const [state, setState] = useState<TimerState>('ready');
-  const [startTime, setStartTime] = useState<number | null>(null);
-  const [spacePressed, setSpacePressed] = useState(false);
-
-  // Update timer display
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    
-    if (state === 'running' && startTime) {
-      interval = setInterval(() => {
-        setTime(Date.now() - startTime);
-      }, 10);
-    } else if (state === 'inspection') {
-      interval = setInterval(() => {
-        setInspectionTimeLeft(prev => {
-          if (prev <= 0) {
-            setState('running');
-            setStartTime(Date.now());
-            return inspectionTime;
-          }
-          return prev - 0.1;
-        });
-      }, 100);
-    }
-
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [state, startTime, inspectionTime]);
-
-  const handleStart = useCallback(() => {
-    if (state === 'ready') {
-      if (useInspection) {
-        setState('inspection');
-        setInspectionTimeLeft(inspectionTime);
-      } else {
-        setState('running');
-        setStartTime(Date.now());
-        setTime(0);
-      }
-    } else if (state === 'inspection') {
-      setState('running');
-      setStartTime(Date.now());
-      setTime(0);
-    }
-  }, [state, useInspection, inspectionTime]);
-
-  const handleStop = useCallback(() => {
-    if (state === 'running') {
-      setState('stopped');
-      onTimeRecord(time);
-    }
-  }, [state, time, onTimeRecord]);
-
-  const handleReset = useCallback(() => {
-    setState('ready');
-    setTime(0);
-    setInspectionTimeLeft(inspectionTime);
-    setStartTime(null);
-  }, [inspectionTime]);
-
-  // Keyboard controls
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.code === 'Space') {
-        e.preventDefault();
-        if (!spacePressed) {
-          setSpacePressed(true);
-          if (state === 'stopped') {
-            handleReset();
-          } else if (state === 'ready' || state === 'inspection') {
-            handleStart();
-          }
-        }
-      }
-    };
-
-    const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.code === 'Space') {
-        e.preventDefault();
-        setSpacePressed(false);
-        if (state === 'running') {
-          handleStop();
-        }
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
-  }, [state, spacePressed, handleStart, handleStop, handleReset]);
+export const Timer = ({ onTimeRecord, settings, onSettingsChange }: TimerProps) => {
+  const { 
+    time, 
+    inspectionTimeLeft, 
+    state, 
+    isSpacePressed 
+  } = useTimer(onTimeRecord, settings);
 
   const getTimerClass = () => {
-    if (state === 'ready' || (state === 'stopped' && spacePressed)) return 'timer-ready';
+    if (state === 'ready' || (state === 'stopped' && isSpacePressed)) return 'timer-ready';
     if (state === 'running') return 'timer-running';
     if (state === 'stopped') return 'timer-stopped';
     if (state === 'inspection') return 'timer-inspection';
@@ -120,6 +27,9 @@ export const Timer = ({ onTimeRecord, useInspection = false, inspectionTime = 15
   const getDisplayTime = () => {
     if (state === 'inspection') {
       return Math.max(0, Math.ceil(inspectionTimeLeft)).toString();
+    }
+    if (settings.hideTimeWhileSolving && state === 'running') {
+      return 'Solving...';
     }
     return formatTime(time);
   };
