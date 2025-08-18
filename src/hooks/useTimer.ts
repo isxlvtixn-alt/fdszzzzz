@@ -19,6 +19,8 @@ export interface TimerHookResult {
   stopTimer: () => void;
   resetTimer: () => void;
   updateSettings: (newSettings: Partial<TimerSettings>) => void;
+  handleTimerPress: () => void;
+  handleTimerRelease: () => void;
 }
 
 export const useTimer = (
@@ -113,18 +115,40 @@ export const useTimer = (
     setSettings(prev => ({ ...prev, ...newSettings }));
   }, []);
 
-  // Keyboard controls
+  // Touch/click handler for timer mechanics
+  const handleTimerPress = useCallback(() => {
+    if (state === 'running') {
+      stopTimer();
+    } else if (state === 'stopped') {
+      resetTimer();
+    }
+  }, [state, stopTimer, resetTimer]);
+
+  const handleTimerRelease = useCallback(() => {
+    if (state === 'ready') {
+      if (settings.useInspection) {
+        setState('inspection');
+        setInspectionTimeLeft(settings.inspectionTime);
+      } else {
+        setState('running');
+        setStartTime(Date.now());
+        setTime(0);
+      }
+    } else if (state === 'inspection') {
+      setState('running');
+      setStartTime(Date.now());
+      setTime(0);
+    }
+  }, [state, settings.useInspection, settings.inspectionTime]);
+
+  // Enhanced keyboard controls with new mechanics
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === 'Space') {
         e.preventDefault();
         if (!isSpacePressed) {
           setIsSpacePressed(true);
-          if (state === 'stopped') {
-            resetTimer();
-          } else if (state === 'ready' || state === 'inspection') {
-            startTimer();
-          }
+          handleTimerPress();
         }
       }
     };
@@ -133,9 +157,7 @@ export const useTimer = (
       if (e.code === 'Space') {
         e.preventDefault();
         setIsSpacePressed(false);
-        if (state === 'running') {
-          stopTimer();
-        }
+        handleTimerRelease();
       }
     };
 
@@ -146,7 +168,7 @@ export const useTimer = (
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [state, isSpacePressed, startTimer, stopTimer, resetTimer]);
+  }, [state, isSpacePressed, handleTimerPress, handleTimerRelease]);
 
   return {
     time,
@@ -158,5 +180,7 @@ export const useTimer = (
     stopTimer,
     resetTimer,
     updateSettings,
+    handleTimerPress,
+    handleTimerRelease,
   };
 };

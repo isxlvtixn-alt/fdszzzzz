@@ -8,8 +8,8 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Modern cubing-themed color palette */
-    --background: 220 25% 6%;
+    /* Modern dark cubing-themed color palette to match screenshot */
+    --background: 220 30% 3%;
     --foreground: 210 40% 98%;
 
     --card: 220 20% 8%;
