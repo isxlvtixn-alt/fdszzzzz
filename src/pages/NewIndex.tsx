@@ -325,8 +325,8 @@ const NewIndex = () => {
           />
         )}
 
-        {/* Mobile Navigation - Only on small screens */}
-        <div className="block sm:hidden">
+        {/* Mobile Navigation - Only on very small screens */}
+        <div className="block md:hidden">
           <MobileNavigation
             activeTab={activeTab}
             onTabChange={setActiveTab}

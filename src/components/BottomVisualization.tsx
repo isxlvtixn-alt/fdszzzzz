@@ -44,13 +44,15 @@ export const BottomVisualization = ({
           />
         </div>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl p-8">
-        <CubeVisualization
-          scramble={scramble}
-          cubeType={cubeType}
-          viewMode={viewMode}
-          size="large"
-        />
+      <DialogContent className="max-w-4xl max-h-[80vh] p-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <CubeVisualization
+            scramble={scramble}
+            cubeType={cubeType}
+            viewMode={viewMode}
+            size="large"
+          />
+        </div>
       </DialogContent>
     </Dialog>
   );
