@@ -19,13 +19,19 @@ interface MenuSettingsProps {
   settings: AppSettings;
   onSettingsChange: (settings: Partial<AppSettings>) => void;
   disabled?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export const MenuSettings = ({ settings, onSettingsChange, disabled }: MenuSettingsProps) => {
+export const MenuSettings = ({ settings, onSettingsChange, disabled, onOpenChange }: MenuSettingsProps) => {
   const [open, setOpen] = useState(false);
 
+  const handleOpenChange = (newOpen: boolean) => {
+    setOpen(newOpen);
+    onOpenChange?.(newOpen);
+  };
+
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
+    <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>
         <Button 
           variant="ghost" 

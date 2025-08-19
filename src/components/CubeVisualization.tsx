@@ -5,9 +5,11 @@ import { TwistyPlayer } from 'cubing/twisty';
 interface CubeVisualizationProps {
   scramble: string;
   cubeType: string;
+  viewMode?: '2D' | '3D';
+  size?: 'small' | 'large';
 }
 
-export const CubeVisualization = ({ scramble, cubeType }: CubeVisualizationProps) => {
+export const CubeVisualization = ({ scramble, cubeType, viewMode = '2D', size = 'small' }: CubeVisualizationProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<TwistyPlayer | null>(null);
 
@@ -24,15 +26,16 @@ export const CubeVisualization = ({ scramble, cubeType }: CubeVisualizationProps
       const player = new TwistyPlayer({
         puzzle: cubeType === '3x3' ? '3x3x3' : cubeType === '2x2' ? '2x2x2' : cubeType === '4x4' ? '4x4x4' : '5x5x5',
         alg: scramble,
-        visualization: '2D',
+        visualization: viewMode,
         background: 'none',
         controlPanel: 'none',
         hintFacelets: 'none',
       });
 
-      player.style.width = '100%';
-      player.style.height = '200px';
-      player.style.maxWidth = '300px';
+      const dimensions = size === 'large' ? { width: '100%', height: '400px', maxWidth: '600px' } : { width: '100%', height: '120px', maxWidth: '150px' };
+      player.style.width = dimensions.width;
+      player.style.height = dimensions.height;
+      player.style.maxWidth = dimensions.maxWidth;
 
       containerRef.current.appendChild(player);
       playerRef.current = player;
@@ -58,19 +61,14 @@ export const CubeVisualization = ({ scramble, cubeType }: CubeVisualizationProps
         playerRef.current = null;
       }
     };
-  }, [scramble, cubeType]);
+  }, [scramble, cubeType, viewMode, size]);
+
+  const containerHeight = size === 'large' ? 'min-h-[400px]' : 'min-h-[120px]';
 
   return (
-    <Card className="timer-card rounded-2xl p-4">
-      <div className="space-y-3">
-        <h3 className="text-sm font-medium text-muted-foreground text-center">
-          Cube State
-        </h3>
-        <div 
-          ref={containerRef}
-          className="flex items-center justify-center min-h-[200px] bg-muted/20 rounded-lg"
-        />
-      </div>
-    </Card>
+    <div 
+      ref={containerRef}
+      className={`flex items-center justify-center ${containerHeight} bg-card/30 rounded-lg border border-border/30`}
+    />
   );
 };

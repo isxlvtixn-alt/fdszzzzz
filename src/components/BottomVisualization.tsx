@@ -7,15 +7,22 @@ interface BottomVisualizationProps {
   cubeType: string;
   viewMode: '2D' | '3D';
   disabled?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 export const BottomVisualization = ({ 
   scramble, 
   cubeType, 
   viewMode,
-  disabled 
+  disabled,
+  onOpenChange 
 }: BottomVisualizationProps) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const handleOpenChange = (open: boolean) => {
+    setIsFullscreen(open);
+    onOpenChange?.(open);
+  };
 
   if (disabled) {
     return (
@@ -26,22 +33,24 @@ export const BottomVisualization = ({
   }
 
   return (
-    <Dialog open={isFullscreen} onOpenChange={setIsFullscreen}>
+    <Dialog open={isFullscreen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <div className="h-32 w-32 mx-auto cursor-pointer transition-transform hover:scale-105">
+        <div className="w-32 h-32 mx-auto cursor-pointer transition-transform hover:scale-105">
           <CubeVisualization
             scramble={scramble}
             cubeType={cubeType}
+            viewMode={viewMode}
+            size="small"
           />
         </div>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl p-8">
-        <div className="w-full h-96">
-          <CubeVisualization
-            scramble={scramble}
-            cubeType={cubeType}
-          />
-        </div>
+      <DialogContent className="max-w-4xl p-8">
+        <CubeVisualization
+          scramble={scramble}
+          cubeType={cubeType}
+          viewMode={viewMode}
+          size="large"
+        />
       </DialogContent>
     </Dialog>
   );

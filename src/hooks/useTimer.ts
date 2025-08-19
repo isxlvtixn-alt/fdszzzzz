@@ -25,7 +25,8 @@ export interface TimerHookResult {
 
 export const useTimer = (
   onTimeRecord: (time: number) => void,
-  timerSettings?: TimerSettings
+  timerSettings?: TimerSettings,
+  disabled?: boolean
 ): TimerHookResult => {
   const [time, setTime] = useState(0);
   const [inspectionTimeLeft, setInspectionTimeLeft] = useState(15);
@@ -143,6 +144,8 @@ export const useTimer = (
 
   // Enhanced keyboard controls with new mechanics
   useEffect(() => {
+    if (disabled) return;
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === 'Space') {
         e.preventDefault();
@@ -168,7 +171,7 @@ export const useTimer = (
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [state, isSpacePressed, handleTimerPress, handleTimerRelease]);
+  }, [state, isSpacePressed, handleTimerPress, handleTimerRelease, disabled]);
 
   return {
     time,

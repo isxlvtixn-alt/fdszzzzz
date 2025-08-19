@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTimer, TimerSettings } from '@/hooks/useTimer';
+import { useSound } from '@/hooks/useSound';
 import { generateEnhancedScramble } from '@/lib/enhanced-scramble-generator';
 import { MenuSettings } from '@/components/MenuSettings';
 import { TopBar } from '@/components/TopBar';
@@ -60,6 +61,12 @@ const NewIndex = () => {
 
   const currentSession = sessions.find(s => s.id === currentSessionId);
   
+  // Check if any windows are open (settings or fullscreen visualization)
+  const [isAnyWindowOpen, setIsAnyWindowOpen] = useState(false);
+  
+  // Sound hooks
+  const { playStart, playStop, playInspection } = useSound(appSettings.sounds);
+  
   const {
     time,
     inspectionTimeLeft,
@@ -67,12 +74,21 @@ const NewIndex = () => {
     isSpacePressed,
     handleTimerPress,
     handleTimerRelease
-  } = useTimer(handleTimeRecord, timerSettings);
+  } = useTimer(handleTimeRecord, timerSettings, activeTab !== 'timer' || isAnyWindowOpen);
 
   // Generate initial scramble
   useEffect(() => {
     setScramble(generateEnhancedScramble(cubeType));
   }, [cubeType]);
+
+  // Play sounds on state changes
+  useEffect(() => {
+    if (state === 'running') {
+      playStart();
+    } else if (state === 'inspection') {
+      playInspection();
+    }
+  }, [state, playStart, playInspection]);
 
   function handleTimeRecord(recordedTime: number) {
     setSessions(prev => prev.map(session => 
@@ -81,9 +97,7 @@ const NewIndex = () => {
         : session
     ));
     setScramble(generateEnhancedScramble(cubeType));
-    if (appSettings.sounds) {
-      // TODO: Play completion sound
-    }
+    playStop();
     toast.success('Time recorded!');
   }
 
@@ -153,6 +167,8 @@ const NewIndex = () => {
   };
 
   const handleTimerClick = () => {
+    if (activeTab !== 'timer' || isAnyWindowOpen) return;
+    
     if (state === 'running') {
       handleTimerPress();
     } else {
@@ -160,21 +176,25 @@ const NewIndex = () => {
     }
   };
 
-  // Check if any windows are open (settings or fullscreen visualization)
-  const isAnyWindowOpen = false; // TODO: Track dialog states
+
+  // Apply theme to document
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', appSettings.theme);
+  }, [appSettings.theme]);
 
   return (
     <div className="min-h-screen flex flex-col">
       {/* Desktop Layout */}
-      <div className="hidden md:block">
+      <div className="hidden lg:block">
         <div className="flex flex-col h-screen">
           {/* Header with Menu and Scramble */}
-          <div className="flex items-center justify-between border-b border-border/50">
+          <div className="flex border-b border-border/50">
             <div className="p-4">
               <MenuSettings
                 settings={appSettings}
                 onSettingsChange={handleAppSettingsChange}
                 disabled={isAnyWindowOpen}
+                onOpenChange={setIsAnyWindowOpen}
               />
             </div>
             
@@ -190,7 +210,7 @@ const NewIndex = () => {
           </div>
 
           {/* Main Timer Area */}
-          <div className="flex-1 flex items-center justify-center">
+          <div className="flex-1 flex items-center justify-center p-8">
             <MainTimer
               time={time}
               inspectionTimeLeft={inspectionTimeLeft}
@@ -198,30 +218,31 @@ const NewIndex = () => {
               isSpacePressed={isSpacePressed}
               hideTime={appSettings.hideTimeWhileSolving}
               onTimerClick={handleTimerClick}
-              disabled={isAnyWindowOpen}
+              disabled={activeTab !== 'timer' || isAnyWindowOpen}
             />
           </div>
 
           {/* Bottom Section */}
           <div className="border-t border-border/50">
-            <div className="grid grid-cols-3 gap-4 p-4">
+            <div className="grid grid-cols-3 gap-6 p-6 items-center min-h-[140px]">
               {/* Left: Stats */}
-              <div className="flex items-center">
+              <div className="flex justify-start">
                 <BottomStats times={currentSession?.times || []} />
               </div>
 
               {/* Center: Cube Visualization */}
-              <div className="flex items-center justify-center">
+              <div className="flex justify-center">
                 <BottomVisualization
                   scramble={scramble}
                   cubeType={cubeType}
                   viewMode={appSettings.scrambleView}
                   disabled={isAnyWindowOpen}
+                  onOpenChange={setIsAnyWindowOpen}
                 />
               </div>
 
               {/* Right: Session Info */}
-              <div className="flex items-center justify-end">
+              <div className="flex justify-end">
                 <div className="text-right text-sm text-muted-foreground">
                   <div className="font-medium">{currentSession?.name}</div>
                   <div>{currentSession?.times.length || 0} solves</div>
@@ -233,7 +254,7 @@ const NewIndex = () => {
       </div>
 
       {/* Mobile Layout */}
-      <div className="md:hidden flex flex-col h-screen">
+      <div className="lg:hidden flex flex-col h-screen">
         {activeTab === 'timer' ? (
           <>
             {/* Mobile Header */}
@@ -242,6 +263,7 @@ const NewIndex = () => {
                 settings={appSettings}
                 onSettingsChange={handleAppSettingsChange}
                 disabled={isAnyWindowOpen}
+                onOpenChange={setIsAnyWindowOpen}
               />
               
               <div className="text-center">
@@ -263,27 +285,31 @@ const NewIndex = () => {
 
             {/* Mobile Timer */}
             <div className="flex-1 flex flex-col">
-              <MainTimer
-                time={time}
-                inspectionTimeLeft={inspectionTimeLeft}
-                state={state}
-                isSpacePressed={isSpacePressed}
-                hideTime={appSettings.hideTimeWhileSolving}
-                onTimerClick={handleTimerClick}
-                disabled={isAnyWindowOpen}
-              />
-              
-              {/* Mobile Stats */}
-              <BottomStats times={currentSession?.times || []} />
-              
-              {/* Mobile Cube Visualization */}
-              <div className="p-4 flex justify-center">
-                <BottomVisualization
-                  scramble={scramble}
-                  cubeType={cubeType}
-                  viewMode={appSettings.scrambleView}
-                  disabled={isAnyWindowOpen}
+              <div className="flex-1 flex items-center justify-center p-4">
+                <MainTimer
+                  time={time}
+                  inspectionTimeLeft={inspectionTimeLeft}
+                  state={state}
+                  isSpacePressed={isSpacePressed}
+                  hideTime={appSettings.hideTimeWhileSolving}
+                  onTimerClick={handleTimerClick}
+                  disabled={activeTab !== 'timer' || isAnyWindowOpen}
                 />
+              </div>
+              
+              {/* Mobile Bottom Section */}
+              <div className="border-t border-border/50 p-4 space-y-4">
+                <BottomStats times={currentSession?.times || []} />
+                
+                <div className="flex justify-center">
+                  <BottomVisualization
+                    scramble={scramble}
+                    cubeType={cubeType}
+                    viewMode={appSettings.scrambleView}
+                    disabled={isAnyWindowOpen}
+                    onOpenChange={setIsAnyWindowOpen}
+                  />
+                </div>
               </div>
             </div>
           </>
@@ -299,11 +325,13 @@ const NewIndex = () => {
           />
         )}
 
-        {/* Mobile Navigation */}
-        <MobileNavigation
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-        />
+        {/* Mobile Navigation - Only on small screens */}
+        <div className="block sm:hidden">
+          <MobileNavigation
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+          />
+        </div>
       </div>
     </div>
   );

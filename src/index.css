@@ -8,68 +8,73 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Modern dark cubing-themed color palette to match screenshot */
+    /* Default dark theme */
     --background: 220 30% 3%;
     --foreground: 210 40% 98%;
-
     --card: 220 20% 8%;
     --card-foreground: 210 40% 98%;
-
     --popover: 220 20% 8%;
     --popover-foreground: 210 40% 98%;
-
     --primary: 142 76% 36%;
     --primary-foreground: 220 25% 6%;
-
     --secondary: 220 15% 12%;
     --secondary-foreground: 210 40% 98%;
-
     --muted: 220 15% 12%;
     --muted-foreground: 215 20.2% 65.1%;
-
     --accent: 204 100% 50%;
     --accent-foreground: 220 25% 6%;
-
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-
     --border: 220 15% 15%;
     --input: 220 15% 15%;
     --ring: 142 76% 36%;
-
-    /* Timer specific colors */
     --timer-ready: 142 76% 36%;
     --timer-running: 204 100% 50%;
     --timer-stopped: 39 96% 59%;
     --timer-inspection: 0 84% 60%;
-
-    /* Beautiful gradients */
     --gradient-primary: linear-gradient(135deg, hsl(142 76% 36%), hsl(180 100% 25%));
     --gradient-accent: linear-gradient(135deg, hsl(204 100% 50%), hsl(220 100% 60%));
     --gradient-bg: linear-gradient(180deg, hsl(220 25% 6%), hsl(220 20% 8%));
-    
-    /* Shadows */
     --shadow-timer: 0 20px 60px -12px hsl(142 76% 36% / 0.4);
     --shadow-card: 0 4px 24px -4px hsl(220 25% 6% / 0.8);
     --shadow-glow: 0 0 40px hsl(142 76% 36% / 0.3);
-
     --radius: 0.5rem;
+  }
 
-    --sidebar-background: 0 0% 98%;
+  /* Blue theme */
+  [data-theme="blue"] {
+    --primary: 217 91% 60%;
+    --primary-foreground: 220 25% 6%;
+    --accent: 204 100% 50%;
+    --timer-ready: 217 91% 60%;
+    --ring: 217 91% 60%;
+    --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(204 100% 50%));
+    --shadow-timer: 0 20px 60px -12px hsl(217 91% 60% / 0.4);
+    --shadow-glow: 0 0 40px hsl(217 91% 60% / 0.3);
+  }
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+  /* Green theme */
+  [data-theme="green"] {
+    --primary: 120 60% 50%;
+    --primary-foreground: 220 25% 6%;
+    --accent: 150 100% 40%;
+    --timer-ready: 120 60% 50%;
+    --ring: 120 60% 50%;
+    --gradient-primary: linear-gradient(135deg, hsl(120 60% 50%), hsl(150 100% 40%));
+    --shadow-timer: 0 20px 60px -12px hsl(120 60% 50% / 0.4);
+    --shadow-glow: 0 0 40px hsl(120 60% 50% / 0.3);
+  }
 
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+  /* Purple theme */
+  [data-theme="purple"] {
+    --primary: 270 95% 75%;
+    --primary-foreground: 220 25% 6%;
+    --accent: 290 100% 60%;
+    --timer-ready: 270 95% 75%;
+    --ring: 270 95% 75%;
+    --gradient-primary: linear-gradient(135deg, hsl(270 95% 75%), hsl(290 100% 60%));
+    --shadow-timer: 0 20px 60px -12px hsl(270 95% 75% / 0.4);
+    --shadow-glow: 0 0 40px hsl(270 95% 75% / 0.3);
   }
 
   .dark {
