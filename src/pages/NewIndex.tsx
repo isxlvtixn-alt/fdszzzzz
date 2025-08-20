@@ -9,7 +9,6 @@ import { BottomStats } from '@/components/BottomStats';
 import { BottomVisualization } from '@/components/BottomVisualization';
 import { HistoryTab } from '@/components/HistoryTab';
 import { UniversalNavigation } from '@/components/UniversalNavigation';
-import { TimerActions } from '@/components/TimerActions';
 import { SwipeableToast } from '@/components/SwipeableToast';
 
 interface AppSettings {
@@ -144,7 +143,10 @@ const NewIndex = () => {
 
   const handleTimerClick = () => {
     if (activeTab !== 'timer' || isAnyWindowOpen) return;
-    state === 'running' ? handleTimerPress() : (handleTimerRelease(), setShowTimerActions(false));
+    handleTimerPress();
+    if (state === 'stopped') {
+      setShowTimerActions(false);
+    }
   };
 
   useEffect(() => document.documentElement.setAttribute('data-theme', appSettings.theme), [appSettings.theme]);
@@ -167,8 +169,8 @@ const NewIndex = () => {
               <div className="flex items-center justify-between border-b border-border/50 p-4">
                 <MenuSettings
                   settings={appSettings}
-                  onSettingsChange={setAppSettings}
-                  disabled={isAnyWindowOpen}
+                  onSettingsChange={(newSettings) => setAppSettings(prev => ({ ...prev, ...newSettings }))}
+                  disabled={state === 'running'}
                   onOpenChange={setIsAnyWindowOpen}
                 />
                 <div className="text-center">
@@ -194,42 +196,35 @@ const NewIndex = () => {
                   hideTime={appSettings.hideTimeWhileSolving}
                   onTimerClick={handleTimerClick}
                   disabled={isAnyWindowOpen}
+                  // Timer Actions Props
+                  showActions={state === 'stopped' && !isAnyWindowOpen}
+                  onPlusTwo={handlePlusTwo}
+                  onDNF={handleDNF}
+                  onDelete={handleDeleteLastTime}
+                  onFavorite={handleFavoriteTime}
                 />
               </div>
 
-              {showTimerActions && state === 'stopped' && (
-                <div className="border-t border-border/50 p-3">
-                  <TimerActions
-                    time={lastRecordedTime || 0}
-                    visible={showTimerActions}
-                    onPlusTwo={handlePlusTwo}
-                    onDNF={handleDNF}
-                    onDelete={handleDeleteLastTime}
-                    onFavorite={handleFavoriteTime}
-                  />
-                </div>
-              )}
 
-<div className="border-t border-border/50 bg-card/30 py-1 pl-4 pr-4">
-  <div className="flex items-center justify-between h-0">
-    <div className="w-20">
-      <BottomStats times={currentSession?.times || []} />
-    </div>
-    <div className="flex-1 px-2 flex justify-center">
-      <BottomVisualization
-        scramble={scramble}
-        cubeType={cubeType}
-        viewMode={appSettings.scrambleView}
-        disabled={isAnyWindowOpen}
-        onOpenChange={setIsAnyWindowOpen}
-      />
-    </div>
-    <div className="w-20 text-right text-xs text-muted-foreground">
-      <div className="font-medium truncate">{currentSession?.name}</div>
-      <div>{currentSession?.times.length || 0} solves</div>
-    </div>
-  </div>
-</div>
+              <div className="border-t border-border/50 bg-card/30">
+                <div className="flex items-center justify-between p-3 h-16">
+                  <div className="w-20">
+                    <BottomStats times={currentSession?.times || []} />
+                  </div>
+                  <div className="flex-1 px-2 flex justify-center">
+                    <BottomVisualization
+                      scramble={scramble}
+                      cubeType={cubeType}
+                      viewMode={appSettings.scrambleView}
+                      disabled={isAnyWindowOpen}
+                    />
+                  </div>
+                  <div className="w-20 text-right text-xs text-muted-foreground">
+                    <div className="font-medium truncate">{currentSession?.name}</div>
+                    <div>{currentSession?.times.length || 0} solves</div>
+                  </div>
+                </div>
+              </div>
 
             </div>
           ) : (

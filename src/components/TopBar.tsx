@@ -23,7 +23,7 @@ export const TopBar = ({
       {/* Scramble Display - Fixed height with vertical scrolling and text wrapping */}
       <div className="bg-card/50 rounded-lg border border-border/50 h-20">
         <div className="p-3 h-full overflow-y-auto">
-          <p className="font-mono text-sm text-foreground/90 leading-relaxed break-words">
+          <p className="font-mono text-base text-foreground/90 leading-relaxed break-words">
             {scramble || 'Press refresh to generate scramble'}
           </p>
         </div>
