@@ -116,7 +116,7 @@ export const useTimer = (
     setSettings(prev => ({ ...prev, ...newSettings }));
   }, []);
 
-  // Touch/click handler for timer mechanics
+  // Universal press handler
   const handleTimerPress = useCallback(() => {
     if (state === 'running') {
       stopTimer();
@@ -125,6 +125,7 @@ export const useTimer = (
     }
   }, [state, stopTimer, resetTimer]);
 
+  // Universal release handler
   const handleTimerRelease = useCallback(() => {
     if (state === 'ready') {
       if (settings.useInspection) {
@@ -142,7 +143,7 @@ export const useTimer = (
     }
   }, [state, settings.useInspection, settings.inspectionTime]);
 
-  // Enhanced keyboard controls with new mechanics
+  // Keyboard + mouse + touch controls
   useEffect(() => {
     if (disabled) return;
 
@@ -164,12 +165,44 @@ export const useTimer = (
       }
     };
 
+    const handleMouseDown = (e: MouseEvent) => {
+      if (e.button === 0) { // левая кнопка
+        e.preventDefault();
+        handleTimerPress();
+      }
+    };
+
+    const handleMouseUp = (e: MouseEvent) => {
+      if (e.button === 0) {
+        e.preventDefault();
+        handleTimerRelease();
+      }
+    };
+
+    const handleTouchStart = (e: TouchEvent) => {
+      e.preventDefault();
+      handleTimerPress();
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      e.preventDefault();
+      handleTimerRelease();
+    };
+
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('touchstart', handleTouchStart, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd, { passive: false });
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchend', handleTouchEnd);
     };
   }, [state, isSpacePressed, handleTimerPress, handleTimerRelease, disabled]);
 
