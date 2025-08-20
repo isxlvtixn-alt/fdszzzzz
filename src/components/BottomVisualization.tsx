@@ -38,7 +38,8 @@ export const BottomVisualization = ({
         </div>
       </DialogTrigger>
       <DialogContent className="max-w-4xl w-full p-0 overflow-hidden">
-        <div className="w-full h-[80vh] min-h-[400px]">
+        {/* Для 3D подгоняем под twisty-player */}
+        <div className="mx-auto" style={{ width: '100%' }}>
           <CubeVisualization
             scramble={scramble}
             cubeType={cubeType}
