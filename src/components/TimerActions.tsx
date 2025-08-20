@@ -1,8 +1,13 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Plus, Ban, X, Star } from 'lucide-react';
@@ -16,13 +21,12 @@ interface TimerActionsProps {
   onFavorite: (comment: string) => void;
 }
 
-export const TimerActions = ({ 
-  time, 
-  visible, 
-  onPlusTwo, 
-  onDNF, 
-  onDelete, 
-  onFavorite 
+export const TimerActions = ({
+  visible,
+  onPlusTwo,
+  onDNF,
+  onDelete,
+  onFavorite
 }: TimerActionsProps) => {
   const [favoriteDialogOpen, setFavoriteDialogOpen] = useState(false);
   const [favoriteComment, setFavoriteComment] = useState('');
@@ -35,49 +39,55 @@ export const TimerActions = ({
     setFavoriteDialogOpen(false);
   };
 
+  const buttonProps = "h-12 w-12 p-0 rounded-xl border-2 transition-colors flex items-center justify-center";
+
   return (
     <Card className="timer-card rounded-2xl p-4 animate-in slide-in-from-bottom-2 duration-300">
       <div className="flex justify-center gap-3">
+        {/* +2 */}
         <Button
           variant="outline"
           size="sm"
           onClick={onPlusTwo}
-          className="h-12 w-12 p-0 rounded-xl border-2 hover:border-accent hover:text-accent transition-colors"
+          className={`${buttonProps} hover:border-accent hover:text-accent`}
         >
           <Plus className="h-4 w-4" />
           <span className="text-xs ml-1">2</span>
         </Button>
 
+        {/* DNF */}
         <Button
           variant="outline"
           size="sm"
           onClick={onDNF}
-          className="h-12 px-4 rounded-xl border-2 hover:border-destructive hover:text-destructive transition-colors"
+          className={`${buttonProps} hover:border-destructive hover:text-destructive`}
         >
           <Ban className="h-4 w-4 mr-1" />
           <span className="text-xs">DNF</span>
         </Button>
 
+        {/* Delete */}
         <Button
           variant="outline"
           size="sm"
           onClick={onDelete}
-          className="h-12 w-12 p-0 rounded-xl border-2 hover:border-destructive hover:text-destructive transition-colors"
+          className={`${buttonProps} hover:border-destructive hover:text-destructive`}
         >
           <X className="h-4 w-4" />
         </Button>
 
+        {/* Favorite */}
         <Dialog open={favoriteDialogOpen} onOpenChange={setFavoriteDialogOpen}>
           <DialogTrigger asChild>
             <Button
               variant="outline"
               size="sm"
-              className="h-12 w-12 p-0 rounded-xl border-2 hover:border-timer-stopped hover:text-timer-stopped transition-colors"
+              className={`${buttonProps} hover:border-timer-stopped hover:text-timer-stopped`}
             >
               <Star className="h-4 w-4" />
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="sm:max-w-sm">
             <DialogHeader>
               <DialogTitle>Add to Favorites</DialogTitle>
             </DialogHeader>
