@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { formatTime } from '@/lib/timer-utils';
 
 interface BottomStatsProps {
-  times: number[];
+  times: Array<{ time: number; isPlusTwo?: boolean; isDNF?: boolean; }>;
 }
 
 export const BottomStats = ({ times }: BottomStatsProps) => {
@@ -17,13 +17,29 @@ export const BottomStats = ({ times }: BottomStatsProps) => {
       };
     }
 
+    // Convert to numbers, handling DNF and +2
+    const validTimes = times
+      .filter(entry => !entry.isDNF)
+      .map(entry => entry.time);
+
+    if (validTimes.length === 0) {
+      return {
+        current: 'DNF',
+        best: 'DNF',
+        ao5: 'DNF',
+        ao12: 'DNF',
+        count: times.length
+      };
+    }
+
     const current = times[times.length - 1];
-    const best = Math.min(...times);
+    const currentDisplay = current.isDNF ? 'DNF' : formatTime(current.time);
+    const best = Math.min(...validTimes);
     
     // Calculate Ao5 (Average of 5)
     let ao5 = 0;
-    if (times.length >= 5) {
-      const last5 = times.slice(-5);
+    if (validTimes.length >= 5) {
+      const last5 = validTimes.slice(-5);
       const sorted = [...last5].sort((a, b) => a - b);
       // Remove best and worst, average the middle 3
       const middle3 = sorted.slice(1, 4);
@@ -32,8 +48,8 @@ export const BottomStats = ({ times }: BottomStatsProps) => {
 
     // Calculate Ao12 (Average of 12)
     let ao12 = 0;
-    if (times.length >= 12) {
-      const last12 = times.slice(-12);
+    if (validTimes.length >= 12) {
+      const last12 = validTimes.slice(-12);
       const sorted = [...last12].sort((a, b) => a - b);
       // Remove best and worst, average the middle 10
       const middle10 = sorted.slice(1, 11);
@@ -41,34 +57,34 @@ export const BottomStats = ({ times }: BottomStatsProps) => {
     }
 
     return {
-      current: formatTime(current),
+      current: currentDisplay,
       best: formatTime(best),
-      ao5: times.length >= 5 ? formatTime(ao5) : '-',
-      ao12: times.length >= 12 ? formatTime(ao12) : '-',
+      ao5: validTimes.length >= 5 ? formatTime(ao5) : '-',
+      ao12: validTimes.length >= 12 ? formatTime(ao12) : '-',
       count: times.length
     };
   }, [times]);
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 text-center">
-      <div className="space-y-1">
-        <div className="text-xs text-muted-foreground uppercase tracking-wide">Last</div>
-        <div className="text-sm font-mono">{stats.current}</div>
+    <div className="space-y-2 text-xs">
+      <div className="flex items-center justify-between">
+        <span className="text-muted-foreground">Last:</span>
+        <span className="font-mono">{stats.current}</span>
       </div>
       
-      <div className="space-y-1">
-        <div className="text-xs text-muted-foreground uppercase tracking-wide">Best</div>
-        <div className="text-sm font-mono text-timer-stopped">{stats.best}</div>
+      <div className="flex items-center justify-between">
+        <span className="text-muted-foreground">Best:</span>
+        <span className="font-mono text-timer-stopped">{stats.best}</span>
       </div>
       
-      <div className="space-y-1">
-        <div className="text-xs text-muted-foreground uppercase tracking-wide">Ao5</div>
-        <div className="text-sm font-mono">{stats.ao5}</div>
+      <div className="flex items-center justify-between">
+        <span className="text-muted-foreground">Ao5:</span>
+        <span className="font-mono">{stats.ao5}</span>
       </div>
       
-      <div className="space-y-1">
-        <div className="text-xs text-muted-foreground uppercase tracking-wide">Ao12</div>
-        <div className="text-sm font-mono">{stats.ao12}</div>
+      <div className="flex items-center justify-between">
+        <span className="text-muted-foreground">Ao12:</span>
+        <span className="font-mono">{stats.ao12}</span>
       </div>
     </div>
   );
