@@ -36,9 +36,9 @@ export const MainTimer: React.FC<MainTimerProps> = ({
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
     const centiseconds = Math.floor((ms % 1000) / 10);
-    return `${minutes > 0 ? minutes + ":" : ""}${seconds.toString().padStart(2, "0")}.${centiseconds
+    return `${minutes > 0 ? minutes + ":" : ""}${seconds
       .toString()
-      .padStart(2, "0")}`;
+      .padStart(2, "0")}.${centiseconds.toString().padStart(2, "0")}`;
   };
 
   const displayTime =
@@ -49,17 +49,16 @@ export const MainTimer: React.FC<MainTimerProps> = ({
       : formatTime(time);
 
   return (
-    <div
-      className="flex flex-col items-center justify-center w-full h-full select-none"
-      onMouseDown={!disabled ? onTimerClick : undefined}
-      onMouseUp={!disabled ? onTimerRelease : undefined}
-      onTouchStart={!disabled ? onTimerClick : undefined}
-      onTouchEnd={!disabled ? onTimerRelease : undefined}
-    >
+    <div className="flex flex-col items-center justify-center w-full h-full select-none">
+      {/* 🔹 Обработчики теперь только на цифрах таймера */}
       <div
-        className={`text-6xl font-mono transition-colors ${
+        className={`timer-display text-6xl md:text-8xl lg:text-9xl font-bold transition-colors ${
           state === "ready" ? "text-green-500" : ""
         } ${isSpacePressed ? "opacity-80" : ""}`}
+        onMouseDown={!disabled ? onTimerClick : undefined}
+        onMouseUp={!disabled ? onTimerRelease : undefined}
+        onTouchStart={!disabled ? onTimerClick : undefined}
+        onTouchEnd={!disabled ? onTimerRelease : undefined}
       >
         {displayTime}
       </div>
@@ -91,6 +90,10 @@ export const MainTimer: React.FC<MainTimerProps> = ({
           )}
         </div>
       )}
+
+      <div className="text-muted-foreground text-sm md:text-base mt-4 text-center">
+        Press SPACE or TAP to start
+      </div>
     </div>
   );
 };
