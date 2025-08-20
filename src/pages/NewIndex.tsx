@@ -38,8 +38,8 @@ interface Session {
   createdAt: Date;
 }
 
-const BASE_HEIGHT = 800;
-const NAV_HEIGHT = 48;
+const BASE_HEIGHT = 700;
+const NAV_HEIGHT = 10;
 
 const NewIndex = () => {
   const [activeTab, setActiveTab] = useState<'timer' | 'history'>('timer');
@@ -210,26 +210,27 @@ const NewIndex = () => {
                 </div>
               )}
 
-              <div className="border-t border-border/50 bg-card/30">
-                <div className="flex items-center justify-between p-3 h-16">
-                  <div className="w-20">
-                    <BottomStats times={currentSession?.times || []} />
-                  </div>
-                  <div className="flex-1 px-2 flex justify-center">
-                    <BottomVisualization
-                      scramble={scramble}
-                      cubeType={cubeType}
-                      viewMode={appSettings.scrambleView}
-                      disabled={isAnyWindowOpen}
-                      onOpenChange={setIsAnyWindowOpen}
-                    />
-                  </div>
-                  <div className="w-20 text-right text-xs text-muted-foreground">
-                    <div className="font-medium truncate">{currentSession?.name}</div>
-                    <div>{currentSession?.times.length || 0} solves</div>
-                  </div>
-                </div>
-              </div>
+<div className="border-t border-border/50 bg-card/30 py-1 pl-4 pr-4">
+  <div className="flex items-center justify-between h-0">
+    <div className="w-20">
+      <BottomStats times={currentSession?.times || []} />
+    </div>
+    <div className="flex-1 px-2 flex justify-center">
+      <BottomVisualization
+        scramble={scramble}
+        cubeType={cubeType}
+        viewMode={appSettings.scrambleView}
+        disabled={isAnyWindowOpen}
+        onOpenChange={setIsAnyWindowOpen}
+      />
+    </div>
+    <div className="w-20 text-right text-xs text-muted-foreground">
+      <div className="font-medium truncate">{currentSession?.name}</div>
+      <div>{currentSession?.times.length || 0} solves</div>
+    </div>
+  </div>
+</div>
+
             </div>
           ) : (
             <HistoryTab
