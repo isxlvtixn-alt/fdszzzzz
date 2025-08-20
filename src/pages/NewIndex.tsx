@@ -285,7 +285,7 @@ const NewIndex = () => {
   }, [appSettings.theme]);
 
   return (
-   <div className="min-h-screen flex flex-col overflow-y-auto pb-20">
+<div className="h-screen flex flex-col overflow-hidden">
       {/* Swipeable Toast */}
       {toast && (
         <SwipeableToast
