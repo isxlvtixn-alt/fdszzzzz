@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'; 
 import { formatTime } from '@/lib/timer-utils';
 import { TimerState } from '@/hooks/useTimer';
 import { Button } from '@/components/ui/button';
@@ -19,7 +19,8 @@ interface MainTimerProps {
   state: TimerState;
   isSpacePressed: boolean;
   hideTime: boolean;
-  onTimerClick: () => void;
+  onTimerPress: () => void;
+  onTimerRelease: () => void;
   disabled?: boolean;
   // Timer Actions Props
   showActions?: boolean;
@@ -35,7 +36,8 @@ export const MainTimer = ({
   state, 
   isSpacePressed,
   hideTime,
-  onTimerClick,
+  onTimerPress,
+  onTimerRelease,
   disabled,
   showActions,
   onPlusTwo,
@@ -45,6 +47,7 @@ export const MainTimer = ({
 }: MainTimerProps) => {
   const [favoriteDialogOpen, setFavoriteDialogOpen] = useState(false);
   const [favoriteComment, setFavoriteComment] = useState('');
+
   const getTimerClass = () => {
     if (disabled) return 'text-muted-foreground/50';
     if (state === 'ready' || (state === 'stopped' && isSpacePressed)) return 'timer-ready';
@@ -67,8 +70,8 @@ export const MainTimer = ({
   const getInstruction = () => {
     if (disabled) return 'Close settings to continue';
     if (state === 'ready') return 'Press SPACE or TAP to start';
-    if (state === 'inspection') return 'Get ready... Release SPACE to start solving';
-    if (state === 'running') return 'Solving... Press SPACE to stop';
+    if (state === 'inspection') return 'Get ready... Release SPACE/TAP to start solving';
+    if (state === 'running') return 'Solving... Press SPACE or TAP to stop';
     if (state === 'stopped') return 'Press SPACE or TAP for next solve';
     return '';
   };
@@ -80,9 +83,12 @@ export const MainTimer = ({
   };
 
   return (
-    <div 
+    <div
       className="flex-1 flex flex-col items-center justify-center min-h-[50vh] cursor-pointer select-none"
-      onClick={!disabled ? onTimerClick : undefined}
+      onMouseDown={!disabled ? onTimerPress : undefined}
+      onMouseUp={!disabled ? onTimerRelease : undefined}
+      onTouchStart={!disabled ? onTimerPress : undefined}
+      onTouchEnd={!disabled ? onTimerRelease : undefined}
     >
       <div className="flex items-center gap-6">
         <div 
