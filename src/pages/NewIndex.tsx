@@ -285,7 +285,7 @@ const NewIndex = () => {
   }, [appSettings.theme]);
 
   return (
-    <div className="h-screen flex flex-col pb-14 overflow-hidden">
+    <div className="h-screen flex flex-col overflow-hidden">
       {/* Swipeable Toast */}
       {toast && (
         <SwipeableToast
@@ -342,13 +342,15 @@ const NewIndex = () => {
                 <BottomStats times={currentSession?.times || []} />
               </div>
 
-              {/* Center: Scramble Display */}
-              <div className="flex-1 px-4">
-                <div className="bg-card/50 rounded-lg p-3 text-center">
-                  <div className="text-sm font-mono text-muted-foreground leading-relaxed">
-                    {scramble}
-                  </div>
-                </div>
+              {/* Center: Cube Visualization */}
+              <div className="flex-1 px-4 flex justify-center">
+                <BottomVisualization
+                  scramble={scramble}
+                  cubeType={cubeType}
+                  viewMode={appSettings.scrambleView}
+                  disabled={isAnyWindowOpen}
+                  onOpenChange={setIsAnyWindowOpen}
+                />
               </div>
 
               {/* Right: Session Info */}
@@ -434,20 +436,22 @@ const NewIndex = () => {
               )}
               
               {/* Mobile Bottom Section */}
-              <div className="border-t border-border/50 bg-card/30 flex-shrink-0 mb-1">
+              <div className="border-t border-border/50 bg-card/30 flex-shrink-0 pb-14">
                 <div className="flex items-center justify-between p-3 h-16">
                   {/* Left: Stats */}
-                  <div className="w-24">
+                  <div className="w-20">
                     <BottomStats times={currentSession?.times || []} />
                   </div>
 
-                  {/* Center: Scramble Display */}
-                  <div className="flex-1 px-2">
-                    <div className="bg-card/50 rounded-lg p-2 text-center">
-                      <div className="text-xs font-mono text-muted-foreground leading-relaxed">
-                        {scramble}
-                      </div>
-                    </div>
+                  {/* Center: Cube Visualization */}
+                  <div className="flex-1 px-2 flex justify-center">
+                    <BottomVisualization
+                      scramble={scramble}
+                      cubeType={cubeType}
+                      viewMode={appSettings.scrambleView}
+                      disabled={isAnyWindowOpen}
+                      onOpenChange={setIsAnyWindowOpen}
+                    />
                   </div>
 
                   {/* Right: Session Info */}
@@ -472,11 +476,13 @@ const NewIndex = () => {
         )}
       </div>
 
-      {/* Universal Navigation */}
-      <UniversalNavigation
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-      />
+      {/* Universal Navigation - Only on mobile/tablet */}
+      <div className="lg:hidden">
+        <UniversalNavigation
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
+      </div>
     </div>
   );
 };
