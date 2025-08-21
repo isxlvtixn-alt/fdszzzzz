@@ -149,60 +149,47 @@ export const useTimer = (
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === 'Space') {
-        e.preventDefault();
-        if (!isSpacePressed) {
-          setIsSpacePressed(true);
-          handleTimerPress();
+        // Only handle spacebar when no modals/inputs are active
+        const activeElement = document.activeElement;
+        const isInputActive = activeElement?.tagName === 'INPUT' || 
+                            activeElement?.tagName === 'TEXTAREA' || 
+                            (activeElement as HTMLElement)?.isContentEditable;
+        const isModalOpen = document.querySelector('[role="dialog"]');
+        
+        if (!isInputActive && !isModalOpen) {
+          e.preventDefault();
+          if (!isSpacePressed) {
+            setIsSpacePressed(true);
+            handleTimerPress();
+          }
         }
       }
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
       if (e.code === 'Space') {
-        e.preventDefault();
-        setIsSpacePressed(false);
-        handleTimerRelease();
+        // Only handle spacebar when no modals/inputs are active
+        const activeElement = document.activeElement;
+        const isInputActive = activeElement?.tagName === 'INPUT' || 
+                            activeElement?.tagName === 'TEXTAREA' || 
+                            (activeElement as HTMLElement)?.isContentEditable;
+        const isModalOpen = document.querySelector('[role="dialog"]');
+        
+        if (!isInputActive && !isModalOpen) {
+          e.preventDefault();
+          setIsSpacePressed(false);
+          handleTimerRelease();
+        }
       }
     };
 
-    const handleMouseDown = (e: MouseEvent) => {
-      if (e.button === 0) { // левая кнопка
-        e.preventDefault();
-        handleTimerPress();
-      }
-    };
-
-    const handleMouseUp = (e: MouseEvent) => {
-      if (e.button === 0) {
-        e.preventDefault();
-        handleTimerRelease();
-      }
-    };
-
-    const handleTouchStart = (e: TouchEvent) => {
-      e.preventDefault();
-      handleTimerPress();
-    };
-
-    const handleTouchEnd = (e: TouchEvent) => {
-      e.preventDefault();
-      handleTimerRelease();
-    };
-
+    // Only add keyboard listeners, remove global mouse/touch listeners
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
-    window.addEventListener('mousedown', handleMouseDown);
-    window.addEventListener('mouseup', handleMouseUp);
-    window.addEventListener('touchstart', handleTouchStart, { passive: false });
-    window.addEventListener('touchend', handleTouchEnd, { passive: false });
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
-      window.removeEventListener('mousedown', handleMouseDown);
-      window.removeEventListener('mouseup', handleMouseUp);
-      window.removeEventListener('touchstart', handleTouchStart);
-      window.removeEventListener('touchend', handleTouchEnd);
     };
   }, [state, isSpacePressed, handleTimerPress, handleTimerRelease, disabled]);
 

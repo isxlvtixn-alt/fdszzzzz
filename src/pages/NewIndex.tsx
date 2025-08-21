@@ -195,6 +195,7 @@ const NewIndex = () => {
                   isSpacePressed={isSpacePressed}
                   hideTime={appSettings.hideTimeWhileSolving}
                   onTimerClick={handleTimerClick}
+                  onTimerRelease={handleTimerRelease}
                   disabled={isAnyWindowOpen}
                   // Timer Actions Props
                   showActions={state === 'stopped' && !isAnyWindowOpen}
