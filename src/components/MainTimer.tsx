@@ -65,11 +65,42 @@ export const MainTimer: React.FC<MainTimerProps> = ({
 
   return (
     <div className="flex flex-col items-center justify-center w-full h-full select-none relative">
-      {/* Timer Actions - positioned above the clickable area */}
+      {/* Expanded clickable timer area */}
+      <div
+        className={`timer-clickable-area flex flex-col items-center justify-center cursor-pointer select-none rounded-xl transition-colors relative z-10
+          ${!disabled ? "hover:bg-muted/20" : ""} 
+          ${isSpacePressed ? "bg-muted/30" : ""}`}
+        style={{ 
+          padding: "4rem",
+          minHeight: "310px",
+          minWidth: "800px"
+        }}
+        onMouseDown={!disabled ? (e) => { e.stopPropagation(); onTimerClick(); } : undefined}
+        onMouseUp={!disabled ? (e) => { e.stopPropagation(); onTimerRelease(); } : undefined}
+        onTouchStart={!disabled ? (e) => { e.stopPropagation(); e.preventDefault(); onTimerClick(); } : undefined}
+        onTouchEnd={!disabled ? (e) => { e.stopPropagation(); e.preventDefault(); onTimerRelease(); } : undefined}
+      >
+        {/* Timer display */}
+        <div
+          className={`timer-display text-6xl md:text-8xl lg:text-9xl font-bold transition-colors select-none pointer-events-none ${
+            state === "ready" ? "text-green-500" : "text-foreground"
+          }`}
+        >
+          {displayTime}
+        </div>
+
+        <div className="text-muted-foreground text-sm md:text-base mt-4 text-center pointer-events-none">
+          Press SPACE or TAP to start
+        </div>
+      </div>
+
+      {/* Timer Actions - overlay on top */}
       {showActions && (
-        <div className="flex gap-3 mb-8 text-sm relative z-10">
+        <div className="absolute bottom-6 flex gap-3 text-sm z-20">
           {onPlusTwo && (
             <button
+              onMouseDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
               onClick={(e) => { e.stopPropagation(); onPlusTwo(); }}
               className="px-4 py-2 rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:bg-blue-500/30 transition-colors font-medium"
             >
@@ -78,6 +109,8 @@ export const MainTimer: React.FC<MainTimerProps> = ({
           )}
           {onDNF && (
             <button
+              onMouseDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
               onClick={(e) => { e.stopPropagation(); onDNF(); }}
               className="px-4 py-2 rounded-lg bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 transition-colors font-medium"
             >
@@ -86,6 +119,8 @@ export const MainTimer: React.FC<MainTimerProps> = ({
           )}
           {onDelete && (
             <button
+              onMouseDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
               onClick={(e) => { e.stopPropagation(); onDelete(); }}
               className="px-4 py-2 rounded-lg bg-muted-foreground/20 text-muted-foreground border border-muted-foreground/30 hover:bg-muted-foreground/30 transition-colors font-medium"
             >
@@ -96,7 +131,9 @@ export const MainTimer: React.FC<MainTimerProps> = ({
             <Dialog open={favoriteDialogOpen} onOpenChange={setFavoriteDialogOpen}>
               <DialogTrigger asChild>
                 <button
-                  onClick={(e) => { e.stopPropagation(); }}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => e.stopPropagation()}
+                  onClick={(e) => e.stopPropagation()}
                   className="px-4 py-2 rounded-lg bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 hover:bg-yellow-500/30 transition-colors font-medium"
                 >
                   ★
@@ -137,35 +174,6 @@ export const MainTimer: React.FC<MainTimerProps> = ({
           )}
         </div>
       )}
-
-      {/* Expanded clickable timer area */}
-      <div
-        className={`timer-clickable-area flex flex-col items-center justify-center cursor-pointer select-none rounded-xl transition-colors ${
-          !disabled ? "hover:bg-muted/20" : ""
-        } ${isSpacePressed ? "bg-muted/30" : ""}`}
-        style={{ 
-          padding: showActions ? "2rem 4rem 3rem 4rem" : "4rem",
-          minHeight: "200px",
-          minWidth: "300px"
-        }}
-        onMouseDown={!disabled ? (e) => { e.stopPropagation(); onTimerClick(); } : undefined}
-        onMouseUp={!disabled ? (e) => { e.stopPropagation(); onTimerRelease(); } : undefined}
-        onTouchStart={!disabled ? (e) => { e.stopPropagation(); e.preventDefault(); onTimerClick(); } : undefined}
-        onTouchEnd={!disabled ? (e) => { e.stopPropagation(); e.preventDefault(); onTimerRelease(); } : undefined}
-      >
-        {/* Timer display */}
-        <div
-          className={`timer-display text-6xl md:text-8xl lg:text-9xl font-bold transition-colors select-none pointer-events-none ${
-            state === "ready" ? "text-green-500" : "text-foreground"
-          }`}
-        >
-          {displayTime}
-        </div>
-
-        <div className="text-muted-foreground text-sm md:text-base mt-4 text-center pointer-events-none">
-          Press SPACE or TAP to start
-        </div>
-      </div>
     </div>
   );
 };
