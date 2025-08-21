@@ -37,7 +37,7 @@ interface Session {
   createdAt: Date;
 }
 
-const BASE_HEIGHT = 700;
+const BASE_HEIGHT = 730;
 const NAV_HEIGHT = 10;
 
 const NewIndex = () => {
@@ -153,105 +153,109 @@ const NewIndex = () => {
 
   return (
     <div className="h-screen w-screen grid grid-rows-[1fr_auto] overflow-hidden">
-      <div ref={containerRef} className="overflow-hidden">
-        <div style={{ transform: `scale(${scale})`, transformOrigin: 'top center' }}>
-          {toast && (
-            <SwipeableToast
-              message={toast.message}
-              type={toast.type}
-              duration={2000}
-              onClose={() => setToast(null)}
+      <div ref={containerRef} className="overflow-hidden relative">
+        {toast && (
+          <SwipeableToast
+            message={toast.message}
+            type={toast.type}
+            duration={2000}
+            onClose={() => setToast(null)}
+          />
+        )}
+
+        {activeTab === 'timer' ? (
+          <div className="flex flex-col h-full">
+{/* Верхняя панель */}
+<div className="flex items-center justify-between border-b border-border/50 p-4">
+  <MenuSettings
+    settings={appSettings}
+    onSettingsChange={(newSettings) => setAppSettings(prev => ({ ...prev, ...newSettings }))}
+    disabled={state === 'running'}
+    onOpenChange={setIsAnyWindowOpen}
+  />
+</div>
+
+
+            <TopBar
+              scramble={scramble}
+              cubeType={cubeType}
+              onNewScramble={() => setScramble(generateEnhancedScramble(cubeType))}
+              onCubeTypeChange={setCubeType}
+              disabled={isAnyWindowOpen}
             />
-          )}
 
-          {activeTab === 'timer' ? (
-            <div className="flex flex-col h-full">
-              <div className="flex items-center justify-between border-b border-border/50 p-4">
-                <MenuSettings
-                  settings={appSettings}
-                  onSettingsChange={(newSettings) => setAppSettings(prev => ({ ...prev, ...newSettings }))}
-                  disabled={state === 'running'}
-                  onOpenChange={setIsAnyWindowOpen}
-                />
-                <div className="text-center">
-                  <div className="font-semibold text-sm">{currentSession?.name}</div>
-                  <div className="text-xs text-muted-foreground">{currentSession?.times.length || 0} solves</div>
+            {/* Таймер (только он скейлится) */}
+            <div className="flex-1 flex items-center justify-center relative">
+  <div
+    style={{
+      transform: `translateY(-90px) scale(${scale})`,
+      transformOrigin: 'center center',
+    }}
+    className="flex items-center justify-center"
+  >
+    <MainTimer
+      time={time}
+      inspectionTimeLeft={inspectionTimeLeft}
+      state={state}
+      isSpacePressed={isSpacePressed}
+      hideTime={appSettings.hideTimeWhileSolving}
+      onTimerClick={handleTimerClick}
+      onTimerRelease={handleTimerRelease}
+      disabled={isAnyWindowOpen}
+      showActions={state === 'stopped' && !isAnyWindowOpen}
+      onPlusTwo={handlePlusTwo}
+      onDNF={handleDNF}
+      onDelete={handleDeleteLastTime}
+      onFavorite={handleFavoriteTime}
+    />
+  </div>
+</div>
+
+
+            {/* Нижняя плашка фиксирована */}
+            <div className="absolute bottom-0 left-0 right-0 border-t border-border/50 bg-card/30">
+              <div className="flex items-center justify-between p-3 h-17">
+                <div className="w-20">
+                  <BottomStats times={currentSession?.times || []} />
+                </div>
+                <div className="flex-1 px-2 flex justify-center">
+                  <BottomVisualization
+                    scramble={scramble}
+                    cubeType={cubeType}
+                    viewMode={appSettings.scrambleView}
+                    disabled={isAnyWindowOpen}
+                  />
+                </div>
+                <div className="w-20 text-right text-xs text-muted-foreground">
+                  <div className="font-medium truncate">{currentSession?.name}</div>
+                  <div>{currentSession?.times.length || 0} solves</div>
                 </div>
               </div>
-
-              <TopBar
-                scramble={scramble}
-                cubeType={cubeType}
-                onNewScramble={() => setScramble(generateEnhancedScramble(cubeType))}
-                onCubeTypeChange={setCubeType}
-                disabled={isAnyWindowOpen}
-              />
-
-              <div className="flex-1 flex items-center justify-center p-4">
-                <MainTimer
-                  time={time}
-                  inspectionTimeLeft={inspectionTimeLeft}
-                  state={state}
-                  isSpacePressed={isSpacePressed}
-                  hideTime={appSettings.hideTimeWhileSolving}
-                  onTimerClick={handleTimerClick}
-                  onTimerRelease={handleTimerRelease}
-                  disabled={isAnyWindowOpen}
-                  // Timer Actions Props
-                  showActions={state === 'stopped' && !isAnyWindowOpen}
-                  onPlusTwo={handlePlusTwo}
-                  onDNF={handleDNF}
-                  onDelete={handleDeleteLastTime}
-                  onFavorite={handleFavoriteTime}
-                />
-              </div>
-
-
-              <div className="mt-4 border-t border-border/50 bg-card/30">
-                <div className="flex items-center justify-between p-3 h-16">
-                  <div className="w-20">
-                    <BottomStats times={currentSession?.times || []} />
-                  </div>
-                  <div className="flex-1 px-2 flex justify-center">
-                    <BottomVisualization
-                      scramble={scramble}
-                      cubeType={cubeType}
-                      viewMode={appSettings.scrambleView}
-                      disabled={isAnyWindowOpen}
-                    />
-                  </div>
-                  <div className="w-20 text-right text-xs text-muted-foreground">
-                    <div className="font-medium truncate">{currentSession?.name}</div>
-                    <div>{currentSession?.times.length || 0} solves</div>
-                  </div>
-                </div>
-              </div>
-
             </div>
-          ) : (
-            <HistoryTab
-              sessions={sessions}
-              currentSessionId={currentSessionId}
-              onSessionChange={setCurrentSessionId}
-              onCreateSession={(name, cube) =>
-                setSessions([...sessions, { id: Date.now().toString(), name, cubeType: cube, times: [], createdAt: new Date() }])
-              }
-              onRenameSession={(id, name) =>
-                setSessions(sessions.map(s => (s.id === id ? { ...s, name } : s)))
-              }
-              onDeleteSession={id =>
-                setSessions(sessions.filter(s => s.id !== id))
-              }
-              onDeleteTime={(id, idx) =>
-                setSessions(
-                  sessions.map(s =>
-                    s.id === id ? { ...s, times: s.times.filter((_, i) => i !== idx) } : s
-                  )
+          </div>
+        ) : (
+          <HistoryTab
+            sessions={sessions}
+            currentSessionId={currentSessionId}
+            onSessionChange={setCurrentSessionId}
+            onCreateSession={(name, cube) =>
+              setSessions([...sessions, { id: Date.now().toString(), name, cubeType: cube, times: [], createdAt: new Date() }])
+            }
+            onRenameSession={(id, name) =>
+              setSessions(sessions.map(s => (s.id === id ? { ...s, name } : s)))
+            }
+            onDeleteSession={id =>
+              setSessions(sessions.filter(s => s.id !== id))
+            }
+            onDeleteTime={(id, idx) =>
+              setSessions(
+                sessions.map(s =>
+                  s.id === id ? { ...s, times: s.times.filter((_, i) => i !== idx) } : s
                 )
-              }
-            />
-          )}
-        </div>
+              )
+            }
+          />
+        )}
       </div>
 
       <div className="h-12">
