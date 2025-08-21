@@ -64,23 +64,10 @@ export const MainTimer: React.FC<MainTimerProps> = ({
   };
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full select-none">
-      {/* Timer display area with controlled click/tap handling */}
-      <div
-        className={`timer-display text-6xl md:text-8xl lg:text-9xl font-bold transition-colors cursor-pointer select-none ${
-          state === "ready" ? "text-green-500" : "text-foreground"
-        } ${isSpacePressed ? "opacity-80" : ""}`}
-        onMouseDown={!disabled ? (e) => { e.stopPropagation(); onTimerClick(); } : undefined}
-        onMouseUp={!disabled ? (e) => { e.stopPropagation(); onTimerRelease(); } : undefined}
-        onTouchStart={!disabled ? (e) => { e.stopPropagation(); e.preventDefault(); onTimerClick(); } : undefined}
-        onTouchEnd={!disabled ? (e) => { e.stopPropagation(); e.preventDefault(); onTimerRelease(); } : undefined}
-      >
-        {displayTime}
-      </div>
-
-      {/* Timer Actions - only shown when stopped */}
+    <div className="flex flex-col items-center justify-center w-full h-full select-none relative">
+      {/* Timer Actions - positioned above the clickable area */}
       {showActions && (
-        <div className="flex gap-3 mt-6 text-sm">
+        <div className="flex gap-3 mb-8 text-sm relative z-10">
           {onPlusTwo && (
             <button
               onClick={(e) => { e.stopPropagation(); onPlusTwo(); }}
@@ -151,8 +138,33 @@ export const MainTimer: React.FC<MainTimerProps> = ({
         </div>
       )}
 
-      <div className="text-muted-foreground text-sm md:text-base mt-4 text-center">
-        Press SPACE or TAP to start
+      {/* Expanded clickable timer area */}
+      <div
+        className={`timer-clickable-area flex flex-col items-center justify-center cursor-pointer select-none rounded-xl transition-colors ${
+          !disabled ? "hover:bg-muted/20" : ""
+        } ${isSpacePressed ? "bg-muted/30" : ""}`}
+        style={{ 
+          padding: showActions ? "2rem 4rem 3rem 4rem" : "4rem",
+          minHeight: "200px",
+          minWidth: "300px"
+        }}
+        onMouseDown={!disabled ? (e) => { e.stopPropagation(); onTimerClick(); } : undefined}
+        onMouseUp={!disabled ? (e) => { e.stopPropagation(); onTimerRelease(); } : undefined}
+        onTouchStart={!disabled ? (e) => { e.stopPropagation(); e.preventDefault(); onTimerClick(); } : undefined}
+        onTouchEnd={!disabled ? (e) => { e.stopPropagation(); e.preventDefault(); onTimerRelease(); } : undefined}
+      >
+        {/* Timer display */}
+        <div
+          className={`timer-display text-6xl md:text-8xl lg:text-9xl font-bold transition-colors select-none pointer-events-none ${
+            state === "ready" ? "text-green-500" : "text-foreground"
+          }`}
+        >
+          {displayTime}
+        </div>
+
+        <div className="text-muted-foreground text-sm md:text-base mt-4 text-center pointer-events-none">
+          Press SPACE or TAP to start
+        </div>
       </div>
     </div>
   );
