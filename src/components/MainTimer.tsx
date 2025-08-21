@@ -72,7 +72,7 @@ export const MainTimer: React.FC<MainTimerProps> = ({
           ${isSpacePressed ? "bg-muted/30" : ""}`}
         style={{ 
           padding: "4rem",
-          minHeight: "290px",
+          minHeight: "275px",
           minWidth: "800px"
         }}
         onMouseDown={!disabled ? (e) => { e.stopPropagation(); onTimerClick(); } : undefined}
