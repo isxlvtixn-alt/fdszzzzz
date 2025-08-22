@@ -11,26 +11,23 @@ export interface TimerSettings {
 
 export interface TimerHookResult {
   time: number;
-  inspectionTimeLeft: number;
+  inspectionTimeLeft: number | null;
   state: TimerState;
   isSpacePressed: boolean;
-  settings: TimerSettings;
-  startTimer: () => void;
-  stopTimer: () => void;
-  resetTimer: () => void;
-  updateSettings: (newSettings: Partial<TimerSettings>) => void;
-  handleTimerPress: () => void;
+  hideTime: boolean;
+  handleTimerClick: () => void;
   handleTimerRelease: () => void;
 }
 
 export const useTimer = (
   onTimeRecord: (time: number) => void,
+  onInspectionTimeout?: () => void,
   timerSettings?: TimerSettings,
   disabled?: boolean
 ): TimerHookResult => {
   const [time, setTime] = useState(0);
-  const [inspectionTimeLeft, setInspectionTimeLeft] = useState(15);
-  const [state, setState] = useState<TimerState>('ready');
+  const [inspectionTimeLeft, setInspectionTime] = useState<number | null>(null);
+  const [currentState, setCurrentState] = useState<TimerState>('ready');
   const [startTime, setStartTime] = useState<number | null>(null);
   const [isSpacePressed, setIsSpacePressed] = useState(false);
   const [settings, setSettings] = useState<TimerSettings>(
@@ -42,6 +39,10 @@ export const useTimer = (
     }
   );
 
+  const state = useRef<TimerState>('ready');
+  const inspectionTimeLeftRef = useRef<number | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
   // Update settings when external settings change
   useEffect(() => {
     if (timerSettings) {
@@ -49,28 +50,31 @@ export const useTimer = (
     }
   }, [timerSettings]);
 
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
   // Timer update loop
   useEffect(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
 
-    if (state === 'running' && startTime) {
+    if (state.current === 'running' && startTime) {
       intervalRef.current = setInterval(() => {
         setTime(Date.now() - startTime);
       }, 10);
-    } else if (state === 'inspection') {
+    } else if (state.current === 'inspection') {
       intervalRef.current = setInterval(() => {
-        setInspectionTimeLeft(prev => {
-          if (prev <= 0) {
-            setState('running');
-            setStartTime(Date.now());
-            return settings.inspectionTime;
+        if (inspectionTimeLeftRef.current !== null) {
+          if (inspectionTimeLeftRef.current <= 0) {
+            // Auto-DNF when inspection timeout
+            state.current = 'stopped';
+            inspectionTimeLeftRef.current = null;
+            setCurrentState('stopped');
+            setInspectionTime(null);
+            onInspectionTimeout?.();
+          } else {
+            inspectionTimeLeftRef.current -= 100;
+            setInspectionTime(inspectionTimeLeftRef.current);
           }
-          return prev - 0.1;
-        });
+        }
       }, 100);
     }
 
@@ -79,69 +83,51 @@ export const useTimer = (
         clearInterval(intervalRef.current);
       }
     };
-  }, [state, startTime, settings.inspectionTime]);
-
-  const startTimer = useCallback(() => {
-    if (state === 'ready') {
-      if (settings.useInspection) {
-        setState('inspection');
-        setInspectionTimeLeft(settings.inspectionTime);
-      } else {
-        setState('running');
-        setStartTime(Date.now());
-        setTime(0);
-      }
-    } else if (state === 'inspection') {
-      setState('running');
-      setStartTime(Date.now());
-      setTime(0);
-    }
-  }, [state, settings.useInspection, settings.inspectionTime]);
-
-  const stopTimer = useCallback(() => {
-    if (state === 'running') {
-      setState('stopped');
-      onTimeRecord(time);
-    }
-  }, [state, time, onTimeRecord]);
-
-  const resetTimer = useCallback(() => {
-    setState('ready');
-    setTime(0);
-    setInspectionTimeLeft(settings.inspectionTime);
-    setStartTime(null);
-  }, [settings.inspectionTime]);
-
-  const updateSettings = useCallback((newSettings: Partial<TimerSettings>) => {
-    setSettings(prev => ({ ...prev, ...newSettings }));
-  }, []);
+  }, [currentState, startTime, onInspectionTimeout]);
 
   // Universal press handler
   const handleTimerPress = useCallback(() => {
-    if (state === 'running') {
-      stopTimer();
-    } else if (state === 'stopped') {
-      resetTimer();
+    if (state.current === 'running') {
+      // Stop timer
+      state.current = 'stopped';
+      setCurrentState('stopped');
+      onTimeRecord(time);
+    } else if (state.current === 'stopped') {
+      // Reset timer
+      state.current = 'ready';
+      setCurrentState('ready');
+      setTime(0);
+      setStartTime(null);
+      inspectionTimeLeftRef.current = null;
+      setInspectionTime(null);
     }
-  }, [state, stopTimer, resetTimer]);
+  }, [time, onTimeRecord]);
 
   // Universal release handler
   const handleTimerRelease = useCallback(() => {
-    if (state === 'ready') {
+    if (state.current === 'ready') {
       if (settings.useInspection) {
-        setState('inspection');
-        setInspectionTimeLeft(settings.inspectionTime);
+        state.current = 'inspection';
+        setCurrentState('inspection');
+        inspectionTimeLeftRef.current = settings.inspectionTime * 1000;
+        setInspectionTime(inspectionTimeLeftRef.current);
       } else {
-        setState('running');
-        setStartTime(Date.now());
+        state.current = 'running';
+        setCurrentState('running');
+        const now = Date.now();
+        setStartTime(now);
         setTime(0);
       }
-    } else if (state === 'inspection') {
-      setState('running');
-      setStartTime(Date.now());
+    } else if (state.current === 'inspection') {
+      state.current = 'running';
+      setCurrentState('running');
+      const now = Date.now();
+      setStartTime(now);
       setTime(0);
+      inspectionTimeLeftRef.current = null;
+      setInspectionTime(null);
     }
-  }, [state, settings.useInspection, settings.inspectionTime]);
+  }, [settings.useInspection, settings.inspectionTime]);
 
   // Keyboard + mouse + touch controls
   useEffect(() => {
@@ -195,15 +181,11 @@ export const useTimer = (
 
   return {
     time,
-    inspectionTimeLeft,
-    state,
+    inspectionTimeLeft: inspectionTimeLeft ? Math.ceil(inspectionTimeLeft / 1000) : null,
+    state: currentState,
     isSpacePressed,
-    settings,
-    startTimer,
-    stopTimer,
-    resetTimer,
-    updateSettings,
-    handleTimerPress,
+    hideTime: settings.hideTimeWhileSolving,
+    handleTimerClick: handleTimerPress,
     handleTimerRelease,
   };
 };
