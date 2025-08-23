@@ -126,8 +126,9 @@ const NewIndex = () => {
   };
 
   const handleTimerClickWrapper = () => {
-    if (activeTab !== 'timer' || isAnyWindowOpen) return;
-    handleTimerClick();
+    if (activeTab === 'timer' && !isAnyWindowOpen) {
+      handleTimerClick();
+    }
   };
 
   // Session management handlers
