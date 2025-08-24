@@ -203,40 +203,30 @@ export const HistoryTab = ({
                         </div>
                       </div>
                       
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          {!timeEntry.autoDnf && (
-                            <DropdownMenuItem
-                              onClick={() => onPlusTwo(timeEntry.id)}
-                              className="text-accent"
-                            >
-                              <PlusTwo className="h-4 w-4 mr-2" />
-                              {timeEntry.plusTwo ? 'Remove +2' : 'Add +2'}
-                            </DropdownMenuItem>
-                          )}
-                          {!timeEntry.autoDnf && (
-                            <DropdownMenuItem
-                              onClick={() => onDNF(timeEntry.id)}
-                              className="text-accent"
-                            >
-                              <Ban className="h-4 w-4 mr-2" />
-                              {timeEntry.dnf ? 'Remove DNF' : 'Add DNF'}
-                            </DropdownMenuItem>
-                          )}
-                          <DropdownMenuItem
-                            onClick={() => onDelete(timeEntry.id)}
-                            className="text-destructive"
+                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {!timeEntry.autoDnf && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); onPlusTwo(timeEntry.id); }}
+                            className="px-2 py-1 text-xs rounded bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:bg-blue-500/30 transition-colors font-medium"
                           >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                            {timeEntry.plusTwo ? '-2' : '+2'}
+                          </button>
+                        )}
+                        {!timeEntry.autoDnf && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); onDNF(timeEntry.id); }}
+                            className="px-2 py-1 text-xs rounded bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 transition-colors font-medium"
+                          >
+                            {timeEntry.dnf ? 'OK' : 'DNF'}
+                          </button>
+                        )}
+                        <button
+                          onClick={(e) => { e.stopPropagation(); onDelete(timeEntry.id); }}
+                          className="px-2 py-1 text-xs rounded bg-muted-foreground/20 text-muted-foreground border border-muted-foreground/30 hover:bg-muted-foreground/30 transition-colors font-medium"
+                        >
+                          ×
+                        </button>
+                      </div>
                     </Card>
                   );
                 })}
