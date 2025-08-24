@@ -8,23 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Trash2, Plus, Edit3, MoreVertical, Star, Plus as PlusTwo, Ban } from 'lucide-react';
 import { formatTime } from '@/lib/timer-utils';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-
-interface TimeEntry {
-  time: number;
-  scramble: string;
-  isFavorite?: boolean;
-  favoriteComment?: string;
-  isPlusTwo?: boolean;
-  isDNF?: boolean;
-}
-
-interface Session {
-  id: string;
-  name: string;
-  cubeType: string;
-  times: TimeEntry[];
-  createdAt: Date;
-}
+import { TimeEntry, Session } from '@/store/types';
 
 interface HistoryTabProps {
   sessions: Session[];
@@ -33,9 +17,9 @@ interface HistoryTabProps {
   onCreateSession: (name: string, cubeType: string) => void;
   onRenameSession: (sessionId: string, newName: string) => void;
   onDeleteSession: (sessionId: string) => void;
-  onDeleteTime: (sessionId: string, timeIndex: number) => void;
-  onPlusTwo?: (sessionId: string, timeIndex: number) => void;
-  onDNF?: (sessionId: string, timeIndex: number) => void;
+  onPlusTwo: (timeId: string) => void;
+  onDNF: (timeId: string) => void;
+  onDelete: (timeId: string) => void;
 }
 
 export const HistoryTab = ({
@@ -45,9 +29,9 @@ export const HistoryTab = ({
   onCreateSession,
   onRenameSession,
   onDeleteSession,
-  onDeleteTime,
   onPlusTwo,
-  onDNF
+  onDNF,
+  onDelete
 }: HistoryTabProps) => {
   const [newSessionDialogOpen, setNewSessionDialogOpen] = useState(false);
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
@@ -185,71 +169,77 @@ export const HistoryTab = ({
               </Card>
             ) : (
               <div className="h-full overflow-y-auto space-y-2">
-                {currentSession.times.map((timeEntry, index) => (
-                  <Card key={index} className="p-3 flex items-center justify-between group hover:shadow-md transition-shadow">
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm text-muted-foreground w-8">
-                        #{currentSession.times.length - index}
-                      </span>
-                      <div className="flex flex-col">
-                        <div className="flex items-center gap-2">
-                          <span className={`font-mono text-lg ${timeEntry.isDNF ? 'text-destructive' : ''}`}>
-                            {timeEntry.isDNF ? 'DNF' : formatTime(timeEntry.time)}
-                          </span>
-                          {timeEntry.isPlusTwo && (
-                            <span className="text-xs text-accent bg-accent/10 px-1 rounded">+2</span>
-                          )}
-                          {timeEntry.isFavorite && (
-                            <Star className="h-4 w-4 text-timer-stopped fill-current" />
-                          )}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {timeEntry.scramble}
-                        </div>
-                        {timeEntry.favoriteComment && (
-                          <div className="text-xs text-muted-foreground italic">
-                            "{timeEntry.favoriteComment}"
+                {[...currentSession.times].reverse().map((timeEntry, reversedIndex) => {
+                  const displayIndex = currentSession.times.length - reversedIndex;
+                  return (
+                    <Card key={timeEntry.id} className="p-3 flex items-center justify-between group hover:shadow-md transition-shadow">
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm text-muted-foreground w-8">
+                          #{displayIndex}
+                        </span>
+                        <div className="flex flex-col">
+                          <div className="flex items-center gap-2">
+                            <span className={`font-mono text-lg ${timeEntry.dnf ? 'text-destructive' : ''}`}>
+                              {timeEntry.dnf ? 'DNF' : formatTime(timeEntry.plusTwo ? timeEntry.time + 2000 : timeEntry.time)}
+                            </span>
+                            {timeEntry.plusTwo && !timeEntry.dnf && (
+                              <span className="text-xs text-accent bg-accent/10 px-1 rounded">+2</span>
+                            )}
+                            {timeEntry.favorite && (
+                              <Star className="h-4 w-4 text-timer-stopped fill-current" />
+                            )}
+                            {timeEntry.autoDnf && (
+                              <span className="text-xs text-destructive bg-destructive/10 px-1 rounded">AUTO</span>
+                            )}
                           </div>
-                        )}
+                          <div className="text-xs text-muted-foreground">
+                            {timeEntry.scramble}
+                          </div>
+                          {timeEntry.comment && (
+                            <div className="text-xs text-muted-foreground italic">
+                              "{timeEntry.comment}"
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                    
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        {!timeEntry.isPlusTwo && !timeEntry.isDNF && onPlusTwo && (
+                      
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          {!timeEntry.autoDnf && (
+                            <DropdownMenuItem
+                              onClick={() => onPlusTwo(timeEntry.id)}
+                              className="text-accent"
+                            >
+                              <PlusTwo className="h-4 w-4 mr-2" />
+                              {timeEntry.plusTwo ? 'Remove +2' : 'Add +2'}
+                            </DropdownMenuItem>
+                          )}
+                          {!timeEntry.autoDnf && (
+                            <DropdownMenuItem
+                              onClick={() => onDNF(timeEntry.id)}
+                              className="text-accent"
+                            >
+                              <Ban className="h-4 w-4 mr-2" />
+                              {timeEntry.dnf ? 'Remove DNF' : 'Add DNF'}
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuItem
-                            onClick={() => onPlusTwo(currentSession.id, index)}
-                            className="text-accent"
+                            onClick={() => onDelete(timeEntry.id)}
+                            className="text-destructive"
                           >
-                            <PlusTwo className="h-4 w-4 mr-2" />
-                            +2 Penalty
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete
                           </DropdownMenuItem>
-                        )}
-                        {!timeEntry.isDNF && onDNF && (
-                          <DropdownMenuItem
-                            onClick={() => onDNF(currentSession.id, index)}
-                            className="text-accent"
-                          >
-                            <Ban className="h-4 w-4 mr-2" />
-                            DNF
-                          </DropdownMenuItem>
-                        )}
-                        <DropdownMenuItem
-                          onClick={() => onDeleteTime(currentSession.id, index)}
-                          className="text-destructive"
-                        >
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </Card>
-                ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </Card>
+                  );
+                })}
               </div>
             )}
           </>

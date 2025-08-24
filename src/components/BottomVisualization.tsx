@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { useState, useRef } from 'react';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { CubeVisualization } from '@/components/CubeVisualization';
 
 interface BottomVisualizationProps {
@@ -7,17 +7,16 @@ interface BottomVisualizationProps {
   cubeType: string;
   viewMode: '2D' | '3D';
   disabled?: boolean;
-  onOpenChange?: (open: boolean) => void;
 }
 
-export const BottomVisualization = ({ 
-  scramble, 
-  cubeType, 
+export const BottomVisualization = ({
+  scramble,
+  cubeType,
   viewMode,
   disabled,
-  onOpenChange
 }: BottomVisualizationProps) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const pointerMoved = useRef(false);
 
   if (disabled) {
     return (
@@ -27,23 +26,39 @@ export const BottomVisualization = ({
     );
   }
 
+  const handlePointerDown = () => {
+    pointerMoved.current = false;
+  };
+
+  const handlePointerMove = () => {
+    pointerMoved.current = true;
+  };
+
+  const handlePointerUp = () => {
+    // Открываем fullscreen только если pointer не двигался
+    if (!pointerMoved.current) {
+      setIsFullscreen(true);
+    }
+  };
+
   return (
-    <Dialog open={isFullscreen} onOpenChange={(open) => {
-      setIsFullscreen(open);
-      onOpenChange?.(open);
-    }}>
-      <DialogTrigger asChild>
-        <div className="h-32 w-32 mx-auto cursor-pointer transition-transform hover:scale-105">
-          <CubeVisualization
-            scramble={scramble}
-            cubeType={cubeType}
-            viewMode={viewMode}
-            size="small"
-          />
-        </div>
-      </DialogTrigger>
+    <Dialog open={isFullscreen} onOpenChange={setIsFullscreen}>
+      <div
+        className="h-32 w-32 mx-auto cursor-pointer transition-transform hover:scale-105"
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+      >
+        <CubeVisualization
+          scramble={scramble}
+          cubeType={cubeType}
+          viewMode={viewMode}
+          size="small"
+        />
+      </div>
+
       <DialogContent className="max-w-4xl w-full p-0 overflow-hidden">
-        <div className="w-full h-[80vh] min-h-[400px]">
+        <div className="mx-auto" style={{ width: '100%' }}>
           <CubeVisualization
             scramble={scramble}
             cubeType={cubeType}

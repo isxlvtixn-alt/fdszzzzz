@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from "react";
 
-export type TimerState = 'ready' | 'inspection' | 'running' | 'stopped';
+export type TimerState = "ready" | "inspection" | "running" | "stopped";
 
 export interface TimerSettings {
   useInspection: boolean;
@@ -11,179 +11,154 @@ export interface TimerSettings {
 
 export interface TimerHookResult {
   time: number;
-  inspectionTimeLeft: number;
+  inspectionTimeLeft: number | null;
   state: TimerState;
   isSpacePressed: boolean;
-  settings: TimerSettings;
-  startTimer: () => void;
-  stopTimer: () => void;
-  resetTimer: () => void;
-  updateSettings: (newSettings: Partial<TimerSettings>) => void;
-  handleTimerPress: () => void;
+  hideTime: boolean;
+  handleTimerClick: () => void;
   handleTimerRelease: () => void;
 }
 
 export const useTimer = (
   onTimeRecord: (time: number) => void,
+  onInspectionTimeout?: () => void,
   timerSettings?: TimerSettings,
   disabled?: boolean
 ): TimerHookResult => {
   const [time, setTime] = useState(0);
-  const [inspectionTimeLeft, setInspectionTimeLeft] = useState(15);
-  const [state, setState] = useState<TimerState>('ready');
+  const [inspectionTimeLeft, setInspectionTime] = useState<number | null>(null);
+  const [currentState, setCurrentState] = useState<TimerState>("ready");
   const [startTime, setStartTime] = useState<number | null>(null);
   const [isSpacePressed, setIsSpacePressed] = useState(false);
-  const [settings, setSettings] = useState<TimerSettings>(
-    timerSettings || {
-      useInspection: false,
-      inspectionTime: 15,
-      stackmatMode: false,
-      hideTimeWhileSolving: false,
-    }
-  );
-
-  // Update settings when external settings change
-  useEffect(() => {
-    if (timerSettings) {
-      setSettings(timerSettings);
-    }
-  }, [timerSettings]);
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  const settings: TimerSettings = timerSettings || {
+    useInspection: false,
+    inspectionTime: 15,
+    stackmatMode: false,
+    hideTimeWhileSolving: false,
+  };
+
   // Timer update loop
   useEffect(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
+    if (intervalRef.current) clearInterval(intervalRef.current);
 
-    if (state === 'running' && startTime) {
+    if (currentState === "running" && startTime) {
       intervalRef.current = setInterval(() => {
         setTime(Date.now() - startTime);
       }, 10);
-    } else if (state === 'inspection') {
+    } else if (currentState === "inspection" && inspectionTimeLeft !== null) {
       intervalRef.current = setInterval(() => {
-        setInspectionTimeLeft(prev => {
+        setInspectionTime((prev) => {
+          if (prev === null) return null;
           if (prev <= 0) {
-            setState('running');
-            setStartTime(Date.now());
-            return settings.inspectionTime;
+            setCurrentState("stopped");
+            onInspectionTimeout?.();
+            return null;
           }
-          return prev - 0.1;
+          return prev - 100;
         });
       }, 100);
     }
 
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
+      if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [state, startTime, settings.inspectionTime]);
+  }, [currentState, startTime, inspectionTimeLeft, onInspectionTimeout]);
 
-  const startTimer = useCallback(() => {
-    if (state === 'ready') {
-      if (settings.useInspection) {
-        setState('inspection');
-        setInspectionTimeLeft(settings.inspectionTime);
-      } else {
-        setState('running');
-        setStartTime(Date.now());
-        setTime(0);
-      }
-    } else if (state === 'inspection') {
-      setState('running');
-      setStartTime(Date.now());
-      setTime(0);
-    }
-  }, [state, settings.useInspection, settings.inspectionTime]);
-
-  const stopTimer = useCallback(() => {
-    if (state === 'running') {
-      setState('stopped');
-      onTimeRecord(time);
-    }
-  }, [state, time, onTimeRecord]);
-
-  const resetTimer = useCallback(() => {
-    setState('ready');
-    setTime(0);
-    setInspectionTimeLeft(settings.inspectionTime);
-    setStartTime(null);
-  }, [settings.inspectionTime]);
-
-  const updateSettings = useCallback((newSettings: Partial<TimerSettings>) => {
-    setSettings(prev => ({ ...prev, ...newSettings }));
-  }, []);
-
-  // Touch/click handler for timer mechanics
+  // Universal press handler
   const handleTimerPress = useCallback(() => {
-    if (state === 'running') {
-      stopTimer();
-    } else if (state === 'stopped') {
-      resetTimer();
+    if (currentState === "running") {
+      // Stop timer
+      setCurrentState("stopped");
+      onTimeRecord(time);
+    } else if (currentState === "stopped") {
+      // Reset timer
+      setCurrentState("ready");
+      setTime(0);
+      setStartTime(null);
+      setInspectionTime(null);
     }
-  }, [state, stopTimer, resetTimer]);
+  }, [currentState, time, onTimeRecord]);
 
+  // Universal release handler
   const handleTimerRelease = useCallback(() => {
-    if (state === 'ready') {
+    if (currentState === "ready") {
       if (settings.useInspection) {
-        setState('inspection');
-        setInspectionTimeLeft(settings.inspectionTime);
+        setCurrentState("inspection");
+        setInspectionTime(settings.inspectionTime * 1000);
       } else {
-        setState('running');
-        setStartTime(Date.now());
+        setCurrentState("running");
+        const now = Date.now();
+        setStartTime(now);
         setTime(0);
       }
-    } else if (state === 'inspection') {
-      setState('running');
-      setStartTime(Date.now());
+    } else if (currentState === "inspection") {
+      setCurrentState("running");
+      const now = Date.now();
+      setStartTime(now);
       setTime(0);
+      setInspectionTime(null);
     }
-  }, [state, settings.useInspection, settings.inspectionTime]);
+  }, [currentState, settings.useInspection, settings.inspectionTime]);
 
-  // Enhanced keyboard controls with new mechanics
+  // Keyboard controls
   useEffect(() => {
     if (disabled) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.code === 'Space') {
-        e.preventDefault();
-        if (!isSpacePressed) {
-          setIsSpacePressed(true);
-          handleTimerPress();
+      if (e.code === "Space") {
+        const activeElement = document.activeElement as HTMLElement | null;
+        const isInputActive =
+          activeElement?.tagName === "INPUT" ||
+          activeElement?.tagName === "TEXTAREA" ||
+          activeElement?.isContentEditable;
+        const isModalOpen = document.querySelector('[role="dialog"]');
+
+        if (!isInputActive && !isModalOpen) {
+          e.preventDefault();
+          if (!isSpacePressed) {
+            setIsSpacePressed(true);
+            handleTimerPress();
+          }
         }
       }
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.code === 'Space') {
-        e.preventDefault();
-        setIsSpacePressed(false);
-        handleTimerRelease();
+      if (e.code === "Space") {
+        const activeElement = document.activeElement as HTMLElement | null;
+        const isInputActive =
+          activeElement?.tagName === "INPUT" ||
+          activeElement?.tagName === "TEXTAREA" ||
+          activeElement?.isContentEditable;
+        const isModalOpen = document.querySelector('[role="dialog"]');
+
+        if (!isInputActive && !isModalOpen) {
+          e.preventDefault();
+          setIsSpacePressed(false);
+          handleTimerRelease();
+        }
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
 
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
     };
-  }, [state, isSpacePressed, handleTimerPress, handleTimerRelease, disabled]);
+  }, [isSpacePressed, handleTimerPress, handleTimerRelease, disabled]);
 
   return {
     time,
-    inspectionTimeLeft,
-    state,
+    inspectionTimeLeft: inspectionTimeLeft ? Math.ceil(inspectionTimeLeft / 1000) : null,
+    state: currentState,
     isSpacePressed,
-    settings,
-    startTimer,
-    stopTimer,
-    resetTimer,
-    updateSettings,
-    handleTimerPress,
+    hideTime: settings.hideTimeWhileSolving,
+    handleTimerClick: handleTimerPress,
     handleTimerRelease,
   };
 };

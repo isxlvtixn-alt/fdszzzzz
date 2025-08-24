@@ -8,7 +8,7 @@ interface UniversalNavigationProps {
 
 export const UniversalNavigation = ({ activeTab, onTabChange }: UniversalNavigationProps) => {
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-sm border-t border-border z-50">
+    <div className="sticky bottom-0 left-0 right-0 bg-card/95 backdrop-blur-sm border-t border-border z-50">
       <div className="flex w-full">
         <Button
           variant={activeTab === 'timer' ? 'default' : 'ghost'}
