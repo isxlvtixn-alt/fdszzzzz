@@ -215,7 +215,7 @@ const NewIndex = () => {
                   inspectionTime: appSettings.inspectionTime,
                   hideTimeWhileSolving: appSettings.hideTime,
                   sounds: appSettings.sounds,
-                  scrambleView: '2D',
+                  scrambleView: appSettings.scrambleView,
                   theme: appSettings.theme,
                 }}
                 onSettingsChange={handleSettingsUpdate}
@@ -236,7 +236,7 @@ const NewIndex = () => {
             <div className="flex-1 flex items-center justify-center relative">
               <div
                 style={{
-                  transform: `translateY(-90px) scale(${scale})`,
+                  transform: `translateY(-10px) scale(${scale})`,
                   transformOrigin: 'center center',
                 }}
                 className="flex items-center justify-center"
@@ -269,7 +269,7 @@ const NewIndex = () => {
                   <BottomVisualization
                     scramble={scramble}
                     cubeType={cubeType}
-                    viewMode="2D"
+                    viewMode={appSettings.scrambleView as '2D' | '3D'}
                     disabled={isAnyWindowOpen}
                   />
                 </div>
