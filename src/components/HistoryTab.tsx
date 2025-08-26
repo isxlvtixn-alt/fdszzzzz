@@ -203,6 +203,7 @@ export const HistoryTab = ({
                         </div>
                       </div>
                       
+<<<<<<< HEAD
 <div className="flex gap-2"> {/* gap-2 вместо gap-1 */}
   {!timeEntry.autoDnf && (
     <button
@@ -227,6 +228,32 @@ export const HistoryTab = ({
     ×
   </button>
 </div>
+=======
+                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {!timeEntry.autoDnf && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); onPlusTwo(timeEntry.id); }}
+                            className="px-2 py-1 text-xs rounded bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:bg-blue-500/30 transition-colors font-medium"
+                          >
+                            {timeEntry.plusTwo ? '-2' : '+2'}
+                          </button>
+                        )}
+                        {!timeEntry.autoDnf && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); onDNF(timeEntry.id); }}
+                            className="px-2 py-1 text-xs rounded bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 transition-colors font-medium"
+                          >
+                            {timeEntry.dnf ? 'OK' : 'DNF'}
+                          </button>
+                        )}
+                        <button
+                          onClick={(e) => { e.stopPropagation(); onDelete(timeEntry.id); }}
+                          className="px-2 py-1 text-xs rounded bg-muted-foreground/20 text-muted-foreground border border-muted-foreground/30 hover:bg-muted-foreground/30 transition-colors font-medium"
+                        >
+                          ×
+                        </button>
+                      </div>
+>>>>>>> 860625af9a2634947b4c1c3b3fe9769ebda8d4a9
                     </Card>
                   );
                 })}

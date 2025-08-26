@@ -215,7 +215,7 @@ const NewIndex = () => {
                   inspectionTime: appSettings.inspectionTime,
                   hideTimeWhileSolving: appSettings.hideTime,
                   sounds: appSettings.sounds,
-                  scrambleView: appSettings.scrambleView,
+                  scrambleView: '3D' as '2D' | '3D',
                   theme: appSettings.theme,
                 }}
                 onSettingsChange={handleSettingsUpdate}
@@ -269,7 +269,7 @@ const NewIndex = () => {
                   <BottomVisualization
                     scramble={scramble}
                     cubeType={cubeType}
-                    viewMode={appSettings.scrambleView as '2D' | '3D'}
+                    viewMode={'3D' as '2D' | '3D'}
                     disabled={isAnyWindowOpen}
                   />
                 </div>
