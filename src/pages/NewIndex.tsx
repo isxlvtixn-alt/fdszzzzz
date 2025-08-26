@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { useTimerStore } from '@/store/timerStore';
 import { useTimer, TimerSettings } from '@/hooks/useTimer';
 import { useSound } from '@/hooks/useSound';
 import { generateEnhancedScramble } from '@/lib/enhanced-scramble-generator';
@@ -12,161 +11,73 @@ import { HistoryTab } from '@/components/HistoryTab';
 import { UniversalNavigation } from '@/components/UniversalNavigation';
 import { SwipeableToast } from '@/components/SwipeableToast';
 
+interface AppSettings {
+  inspection: boolean;
+  inspectionTime: number;
+  hideTimeWhileSolving: boolean;
+  sounds: boolean;
+  scrambleView: '2D' | '3D';
+  theme: string;
+}
+
+interface TimeEntry {
+  time: number;
+  scramble: string;
+  isFavorite?: boolean;
+  favoriteComment?: string;
+  isPlusTwo?: boolean;
+  isDNF?: boolean;
+}
+
+interface Session {
+  id: string;
+  name: string;
+  cubeType: string;
+  times: TimeEntry[];
+  createdAt: Date;
+}
+
 const BASE_HEIGHT = 730;
 const NAV_HEIGHT = 10;
 
 const NewIndex = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(1);
-  const [isAnyWindowOpen, setIsAnyWindowOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'timer' | 'history'>('timer');
+  const [cubeType, setCubeType] = useState('3x3');
+  const [scramble, setScramble] = useState('');
+  const [appSettings, setAppSettings] = useState<AppSettings>({
+    inspection: false,
+    inspectionTime: 15,
+    hideTimeWhileSolving: false,
+    sounds: false,
+    scrambleView: '2D',
+    theme: 'dark'
+  });
+
+  const [sessions, setSessions] = useState<Session[]>([
+    { id: 'default', name: 'Session 1', cubeType: '3x3', times: [], createdAt: new Date() }
+  ]);
+  const [currentSessionId, setCurrentSessionId] = useState('default');
+  const [lastRecordedTime, setLastRecordedTime] = useState<number | null>(null);
+  const [showTimerActions, setShowTimerActions] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
-
-  const {
-    // State
-    sessions,
-    currentSessionId,
-    appSettings,
-    activeTab,
-    cubeType,
-    scramble,
-    lastRecordedTime,
-    
-    // Actions
-    addTime,
-    togglePlusTwo,
-    toggleDNF,
-    deleteTime,
-    favoriteTime,
-    updateSettings,
-    setActiveTab,
-    setCubeType,
-    setScramble,
-    setLastRecordedTime,
-    createSession,
-    deleteSession,
-    renameSession,
-    setCurrentSession,
-    getCurrentSession,
-  } = useTimerStore();
-
-  const currentSession = getCurrentSession();
-  const { playStart, playStop, playInspection } = useSound(appSettings.sounds);
 
   const timerSettings: TimerSettings = {
     useInspection: appSettings.inspection,
     inspectionTime: appSettings.inspectionTime,
     stackmatMode: false,
-    hideTimeWhileSolving: appSettings.hideTime,
+    hideTimeWhileSolving: appSettings.hideTimeWhileSolving,
   };
 
-  // Handle inspection timeout (auto-DNF)
-  const handleInspectionTimeout = () => {
-    const time = 0; // DNF time
-    addTime(time, scramble, true); // true for autoDnf
-    setScramble(generateEnhancedScramble(cubeType));
-    setToast({ message: 'DNF - Inspection timeout', type: 'error' });
-  };
+  const currentSession = sessions.find(s => s.id === currentSessionId);
+  const [isAnyWindowOpen, setIsAnyWindowOpen] = useState(false);
+  const { playStart, playStop, playInspection } = useSound(appSettings.sounds);
 
-  // Handle time recording
-  const handleTimeRecord = (time: number) => {
-    addTime(time, scramble);
-    setScramble(generateEnhancedScramble(cubeType));
-    playStop();
-    setToast({ message: 'Time recorded!', type: 'success' });
-  };
+  const { time, inspectionTimeLeft, state, isSpacePressed, handleTimerPress, handleTimerRelease } =
+    useTimer(handleTimeRecord, timerSettings, activeTab !== 'timer' || isAnyWindowOpen);
 
-  const { time, inspectionTimeLeft, state, isSpacePressed, handleTimerClick, handleTimerRelease } =
-    useTimer(handleTimeRecord, handleInspectionTimeout, timerSettings, activeTab !== 'timer' || isAnyWindowOpen);
+  const [scale, setScale] = useState(1);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Initialize
-  useEffect(() => {
-    if (sessions.length === 0) {
-      createSession(`${cubeType} Session`, cubeType);
-    }
-    if (!scramble) {
-      setScramble(generateEnhancedScramble(cubeType));
-    }
-  }, [sessions.length, scramble, cubeType, createSession, setScramble]);
-
-  // Handle settings changes
-  const handleSettingsUpdate = (newSettings: Partial<typeof appSettings>) => {
-    updateSettings(newSettings);
-  };
-
-  // Timer action handlers for last recorded time
-  const handlePlusTwo = () => {
-    if (lastRecordedTime && !lastRecordedTime.autoDnf) {
-      togglePlusTwo(lastRecordedTime.id);
-      const message = lastRecordedTime.plusTwo ? "Removed +2" : "Added +2";
-      setToast({ message, type: 'info' });
-    }
-  };
-
-  const handleDNF = () => {
-    if (lastRecordedTime && !lastRecordedTime.autoDnf) {
-      toggleDNF(lastRecordedTime.id);
-      const message = lastRecordedTime.dnf ? "Removed DNF" : "Added DNF";
-      setToast({ message, type: 'info' });
-    }
-  };
-
-  const handleDelete = () => {
-    if (lastRecordedTime) {
-      deleteTime(lastRecordedTime.id);
-      setLastRecordedTime(null);
-      setToast({ message: 'Time deleted', type: 'info' });
-    }
-  };
-
-  const handleFavorite = (comment: string) => {
-    if (lastRecordedTime) {
-      favoriteTime(lastRecordedTime.id, comment);
-      setToast({ message: 'Added to favorites!', type: 'success' });
-    }
-  };
-
-  const handleTimerClickWrapper = () => {
-    if (activeTab === 'timer' && !isAnyWindowOpen) {
-      handleTimerClick();
-    }
-  };
-
-  // Session management handlers
-  const handleCreateSession = (name: string, cubeType: string) => {
-    createSession(name, cubeType);
-  };
-
-  const handleDeleteSession = (sessionId: string) => {
-    deleteSession(sessionId);
-    setToast({ message: 'Session deleted', type: 'info' });
-  };
-
-  const handleRenameSession = (sessionId: string, newName: string) => {
-    renameSession(sessionId, newName);
-    setToast({ message: 'Session renamed', type: 'success' });
-  };
-
-  const handleSessionChange = (sessionId: string) => {
-    setCurrentSession(sessionId);
-  };
-
-  // History tab time actions
-  const handleHistoryPlusTwo = (timeId: string) => {
-    togglePlusTwo(timeId);
-    setToast({ message: 'Time updated', type: 'info' });
-  };
-
-  const handleHistoryDNF = (timeId: string) => {
-    toggleDNF(timeId);
-    setToast({ message: 'Time updated', type: 'info' });
-  };
-
-  const handleHistoryDelete = (timeId: string) => {
-    deleteTime(timeId);
-    setToast({ message: 'Time deleted', type: 'info' });
-  };
-
-  // Resize handler
   useEffect(() => {
     const resize = () => {
       const h = window.innerHeight - NAV_HEIGHT;
@@ -177,21 +88,68 @@ const NewIndex = () => {
     return () => window.removeEventListener('resize', resize);
   }, []);
 
-  // Scramble generation when cube type changes
-  useEffect(() => {
-    setScramble(generateEnhancedScramble(cubeType));
-  }, [cubeType, setScramble]);
+  useEffect(() => setScramble(generateEnhancedScramble(cubeType)), [cubeType]);
 
-  // Sound effects
   useEffect(() => {
     if (state === 'running') playStart();
     else if (state === 'inspection') playInspection();
   }, [state, playStart, playInspection]);
 
-  // Theme handling
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', appSettings.theme);
-  }, [appSettings.theme]);
+  function handleTimeRecord(recordedTime: number) {
+    const timeEntry: TimeEntry = { time: recordedTime, scramble, isFavorite: false };
+    setSessions(prev =>
+      prev.map(session =>
+        session.id === currentSessionId ? { ...session, times: [...session.times, timeEntry] } : session
+      )
+    );
+    setLastRecordedTime(recordedTime);
+    setShowTimerActions(true);
+    setScramble(generateEnhancedScramble(cubeType));
+    playStop();
+    setToast({ message: 'Time recorded!', type: 'success' });
+  }
+
+  const updateLastTime = (
+    mapper: (entry: TimeEntry) => TimeEntry,
+    msg: string,
+    type: 'success' | 'error' | 'info' = 'success'
+  ) => {
+    setSessions(prev =>
+      prev.map(session =>
+        session.id === currentSessionId
+          ? { ...session, times: session.times.map((e, i, arr) => (i === arr.length - 1 ? mapper(e) : e)) }
+          : session
+      )
+    );
+    setShowTimerActions(false);
+    setToast({ message: msg, type });
+  };
+
+  const handlePlusTwo = () =>
+    lastRecordedTime &&
+    updateLastTime(e => ({ ...e, isPlusTwo: true, time: e.time + 2000 }), '+2 penalty applied', 'info');
+  const handleDNF = () =>
+    lastRecordedTime && updateLastTime(e => ({ ...e, isDNF: true }), 'DNF applied', 'info');
+  const handleDeleteLastTime = () =>
+    lastRecordedTime &&
+    setSessions(prev =>
+      prev.map(session =>
+        session.id === currentSessionId ? { ...session, times: session.times.slice(0, -1) } : session
+      )
+    );
+  const handleFavoriteTime = (comment: string) =>
+    lastRecordedTime &&
+    updateLastTime(e => ({ ...e, isFavorite: true, favoriteComment: comment }), 'Added to favorites!');
+
+  const handleTimerClick = () => {
+    if (activeTab !== 'timer' || isAnyWindowOpen) return;
+    handleTimerPress();
+    if (state === 'stopped') {
+      setShowTimerActions(false);
+    }
+  };
+
+  useEffect(() => document.documentElement.setAttribute('data-theme', appSettings.theme), [appSettings.theme]);
 
   return (
     <div className="h-screen w-screen grid grid-rows-[1fr_auto] overflow-hidden">
@@ -207,22 +165,16 @@ const NewIndex = () => {
 
         {activeTab === 'timer' ? (
           <div className="flex flex-col h-full">
-            {/* Top panel */}
-            <div className="flex items-center justify-between border-b border-border/50 p-4">
-              <MenuSettings
-                settings={{
-                  inspection: appSettings.inspection,
-                  inspectionTime: appSettings.inspectionTime,
-                  hideTimeWhileSolving: appSettings.hideTime,
-                  sounds: appSettings.sounds,
-                  scrambleView: '3D' as '2D' | '3D',
-                  theme: appSettings.theme,
-                }}
-                onSettingsChange={handleSettingsUpdate}
-                disabled={state === 'running'}
-                onOpenChange={setIsAnyWindowOpen}
-              />
-            </div>
+{/* Верхняя панель */}
+<div className="flex items-center justify-between border-b border-border/50 p-4">
+  <MenuSettings
+    settings={appSettings}
+    onSettingsChange={(newSettings) => setAppSettings(prev => ({ ...prev, ...newSettings }))}
+    disabled={state === 'running'}
+    onOpenChange={setIsAnyWindowOpen}
+  />
+</div>
+
 
             <TopBar
               scramble={scramble}
@@ -232,35 +184,36 @@ const NewIndex = () => {
               disabled={isAnyWindowOpen}
             />
 
-            {/* Timer (scaled) */}
+            {/* Таймер (только он скейлится) */}
             <div className="flex-1 flex items-center justify-center relative">
-              <div
-                style={{
-                  transform: `translateY(-10px) scale(${scale})`,
-                  transformOrigin: 'center center',
-                }}
-                className="flex items-center justify-center"
-              >
-                <MainTimer
-                  time={time}
-                  inspectionTimeLeft={inspectionTimeLeft}
-                  state={state}
-                  isSpacePressed={isSpacePressed}
-                  hideTime={appSettings.hideTime}
-                  onTimerClick={handleTimerClickWrapper}
-                  onTimerRelease={handleTimerRelease}
-                  disabled={isAnyWindowOpen}
-                  showActions={state === 'stopped' && lastRecordedTime && !isAnyWindowOpen}
-                  onPlusTwo={handlePlusTwo}
-                  onDNF={handleDNF}
-                  onDelete={handleDelete}
-                  onFavorite={handleFavorite}
-                />
-              </div>
-            </div>
+  <div
+    style={{
+      transform: `translateY(-90px) scale(${scale})`,
+      transformOrigin: 'center center',
+    }}
+    className="flex items-center justify-center"
+  >
+    <MainTimer
+      time={time}
+      inspectionTimeLeft={inspectionTimeLeft}
+      state={state}
+      isSpacePressed={isSpacePressed}
+      hideTime={appSettings.hideTimeWhileSolving}
+      onTimerClick={handleTimerClick}
+      onTimerRelease={handleTimerRelease}
+      disabled={isAnyWindowOpen}
+      showActions={state === 'stopped' && !isAnyWindowOpen}
+      onPlusTwo={handlePlusTwo}
+      onDNF={handleDNF}
+      onDelete={handleDeleteLastTime}
+      onFavorite={handleFavoriteTime}
+    />
+  </div>
+</div>
 
-            {/* Bottom panel */}
-            <div className="border-t border-border/50 bg-card/30">
+
+            {/* Нижняя плашка фиксирована */}
+            <div className="absolute bottom-0 left-0 right-0 border-t border-border/50 bg-card/30">
               <div className="flex items-center justify-between p-3 h-17">
                 <div className="w-20">
                   <BottomStats times={currentSession?.times || []} />
@@ -269,7 +222,7 @@ const NewIndex = () => {
                   <BottomVisualization
                     scramble={scramble}
                     cubeType={cubeType}
-                    viewMode={'3D' as '2D' | '3D'}
+                    viewMode={appSettings.scrambleView}
                     disabled={isAnyWindowOpen}
                   />
                 </div>
@@ -284,13 +237,23 @@ const NewIndex = () => {
           <HistoryTab
             sessions={sessions}
             currentSessionId={currentSessionId}
-            onSessionChange={handleSessionChange}
-            onCreateSession={handleCreateSession}
-            onRenameSession={handleRenameSession}
-            onDeleteSession={handleDeleteSession}
-            onPlusTwo={handleHistoryPlusTwo}
-            onDNF={handleHistoryDNF}
-            onDelete={handleHistoryDelete}
+            onSessionChange={setCurrentSessionId}
+            onCreateSession={(name, cube) =>
+              setSessions([...sessions, { id: Date.now().toString(), name, cubeType: cube, times: [], createdAt: new Date() }])
+            }
+            onRenameSession={(id, name) =>
+              setSessions(sessions.map(s => (s.id === id ? { ...s, name } : s)))
+            }
+            onDeleteSession={id =>
+              setSessions(sessions.filter(s => s.id !== id))
+            }
+            onDeleteTime={(id, idx) =>
+              setSessions(
+                sessions.map(s =>
+                  s.id === id ? { ...s, times: s.times.filter((_, i) => i !== idx) } : s
+                )
+              )
+            }
           />
         )}
       </div>
