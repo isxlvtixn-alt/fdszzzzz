@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { useState } from 'react';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { CubeVisualization } from '@/components/CubeVisualization';
 
 interface BottomVisualizationProps {
@@ -9,14 +9,13 @@ interface BottomVisualizationProps {
   disabled?: boolean;
 }
 
-export const BottomVisualization = ({
-  scramble,
-  cubeType,
+export const BottomVisualization = ({ 
+  scramble, 
+  cubeType, 
   viewMode,
-  disabled,
+  disabled 
 }: BottomVisualizationProps) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const pointerMoved = useRef(false);
 
   if (disabled) {
     return (
@@ -26,38 +25,20 @@ export const BottomVisualization = ({
     );
   }
 
-  const handlePointerDown = () => {
-    pointerMoved.current = false;
-  };
-
-  const handlePointerMove = () => {
-    pointerMoved.current = true;
-  };
-
-  const handlePointerUp = () => {
-    // Открываем fullscreen только если pointer не двигался
-    if (!pointerMoved.current) {
-      setIsFullscreen(true);
-    }
-  };
-
   return (
     <Dialog open={isFullscreen} onOpenChange={setIsFullscreen}>
-      <div
-        className="h-32 w-32 mx-auto cursor-pointer transition-transform hover:scale-105"
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-      >
-        <CubeVisualization
-          scramble={scramble}
-          cubeType={cubeType}
-          viewMode={viewMode}
-          size="small"
-        />
-      </div>
-
+      <DialogTrigger asChild>
+        <div className="h-32 w-32 mx-auto cursor-pointer transition-transform hover:scale-105">
+          <CubeVisualization
+            scramble={scramble}
+            cubeType={cubeType}
+            viewMode={viewMode}
+            size="small"
+          />
+        </div>
+      </DialogTrigger>
       <DialogContent className="max-w-4xl w-full p-0 overflow-hidden">
+        {/* Для 3D подгоняем под twisty-player */}
         <div className="mx-auto" style={{ width: '100%' }}>
           <CubeVisualization
             scramble={scramble}
