@@ -52,7 +52,7 @@ export const MainTimer: React.FC<MainTimerProps> = ({
     state === "inspection" && inspectionTimeLeft !== null
       ? inspectionTimeLeft.toString()
       : hideTime && state === "running"
-      ? ""
+      ? "Solving..."
       : formatTime(time);
 
   const handleFavorite = () => {

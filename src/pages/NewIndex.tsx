@@ -52,12 +52,12 @@ const NewIndex = () => {
   const currentSession = getCurrentSession();
   const { playStart, playStop, playInspection } = useSound(appSettings.sounds);
 
-  const timerSettings: TimerSettings = {
-    useInspection: appSettings.inspection,
-    inspectionTime: appSettings.inspectionTime,
-    stackmatMode: false,
-    hideTimeWhileSolving: appSettings.hideTime,
-  };
+const timerSettings: TimerSettings = {
+  useInspection: appSettings.inspection,
+  inspectionTime: appSettings.inspectionTime,
+  stackmatMode: false,
+  hideTimeWhileSolving: appSettings.hideTime, // если в hook ждёшь старое имя
+};
 
   // Handle inspection timeout (auto-DNF)
   const handleInspectionTimeout = () => {
@@ -194,111 +194,116 @@ const NewIndex = () => {
   }, [appSettings.theme]);
 
   return (
-    <div className="h-screen w-screen grid grid-rows-[1fr_auto] overflow-hidden">
-      <div ref={containerRef} className="overflow-hidden relative">
-        {toast && (
-          <SwipeableToast
-            message={toast.message}
-            type={toast.type}
-            duration={2000}
-            onClose={() => setToast(null)}
-          />
-        )}
+<div className="min-h-screen w-screen grid grid-rows-[1fr_auto] overflow-hidden">
+  <div
+    ref={containerRef}
+    className="overflow-hidden relative pb-12" // pb-12 для места под нижнюю панель
+  >
+    {toast && (
+      <SwipeableToast
+        message={toast.message}
+        type={toast.type}
+        duration={2000}
+        onClose={() => setToast(null)}
+      />
+    )}
 
-        {activeTab === 'timer' ? (
-          <div className="flex flex-col h-full">
-            {/* Top panel */}
-            <div className="flex items-center justify-between border-b border-border/50 p-4">
-              <MenuSettings
-                settings={{
-                  inspection: appSettings.inspection,
-                  inspectionTime: appSettings.inspectionTime,
-                  hideTimeWhileSolving: appSettings.hideTime,
-                  sounds: appSettings.sounds,
-                  scrambleView: '3D' as '2D' | '3D',
-                  theme: appSettings.theme,
-                }}
-                onSettingsChange={handleSettingsUpdate}
-                disabled={state === 'running'}
-                onOpenChange={setIsAnyWindowOpen}
+    {activeTab === 'timer' ? (
+      <div className="flex flex-col h-full overflow-hidden">
+        {/* Top panel */}
+        <div className="flex items-center justify-between border-b border-border/50 p-4">
+          <MenuSettings
+            settings={{
+              inspection: appSettings.inspection,
+              inspectionTime: appSettings.inspectionTime,
+              hideTime: appSettings.hideTime,
+              sounds: appSettings.sounds,
+              scrambleView: appSettings.scrambleView,
+              theme: appSettings.theme,
+            }}
+            onSettingsChange={handleSettingsUpdate}
+            disabled={state === 'running'}
+            onOpenChange={setIsAnyWindowOpen}
+          />
+        </div>
+
+        <TopBar
+          scramble={scramble}
+          cubeType={cubeType}
+          onNewScramble={() => setScramble(generateEnhancedScramble(cubeType))}
+          onCubeTypeChange={setCubeType}
+          disabled={isAnyWindowOpen}
+        />
+
+        {/* Timer */}
+        <div className="flex-1 flex items-center justify-center overflow-hidden">
+          <div
+            style={{
+              transform: `translateY(-10px) scale(${scale})`,
+              transformOrigin: 'center center',
+            }}
+            className="flex items-center justify-center"
+          >
+            <MainTimer
+              time={time}
+              inspectionTimeLeft={inspectionTimeLeft}
+              state={state}
+              isSpacePressed={isSpacePressed}
+              hideTime={appSettings.hideTime}
+              onTimerClick={handleTimerClickWrapper}
+              onTimerRelease={handleTimerRelease}
+              disabled={isAnyWindowOpen}
+              showActions={state === 'stopped' && lastRecordedTime && !isAnyWindowOpen}
+              onPlusTwo={handlePlusTwo}
+              onDNF={handleDNF}
+              onDelete={handleDelete}
+              onFavorite={handleFavorite}
+            />
+          </div>
+        </div>
+
+        {/* Bottom panel */}
+        <div className="border-t border-border/50 bg-card/30">
+          <div className="flex items-center justify-between p-3 h-17 overflow-hidden">
+            <div className="w-20">
+              <BottomStats times={currentSession?.times ?? []} />
+            </div>
+            <div className="flex-1 px-2 flex justify-center overflow-hidden">
+              <BottomVisualization
+                scramble={scramble}
+                cubeType={cubeType}
+                viewMode={appSettings.scrambleView as '2D' | '3D'}
+                disabled={isAnyWindowOpen}
               />
             </div>
-
-            <TopBar
-              scramble={scramble}
-              cubeType={cubeType}
-              onNewScramble={() => setScramble(generateEnhancedScramble(cubeType))}
-              onCubeTypeChange={setCubeType}
-              disabled={isAnyWindowOpen}
-            />
-
-            {/* Timer (scaled) */}
-            <div className="flex-1 flex items-center justify-center relative">
-              <div
-                style={{
-                  transform: `translateY(-10px) scale(${scale})`,
-                  transformOrigin: 'center center',
-                }}
-                className="flex items-center justify-center"
-              >
-                <MainTimer
-                  time={time}
-                  inspectionTimeLeft={inspectionTimeLeft}
-                  state={state}
-                  isSpacePressed={isSpacePressed}
-                  hideTime={appSettings.hideTime}
-                  onTimerClick={handleTimerClickWrapper}
-                  onTimerRelease={handleTimerRelease}
-                  disabled={isAnyWindowOpen}
-                  showActions={state === 'stopped' && lastRecordedTime && !isAnyWindowOpen}
-                  onPlusTwo={handlePlusTwo}
-                  onDNF={handleDNF}
-                  onDelete={handleDelete}
-                  onFavorite={handleFavorite}
-                />
-              </div>
-            </div>
-
-            {/* Bottom panel */}
-            <div className="border-t border-border/50 bg-card/30">
-              <div className="flex items-center justify-between p-3 h-17">
-                <div className="w-20">
-                  <BottomStats times={currentSession?.times || []} />
-                </div>
-                <div className="flex-1 px-2 flex justify-center">
-                  <BottomVisualization
-                    scramble={scramble}
-                    cubeType={cubeType}
-                    viewMode={'3D' as '2D' | '3D'}
-                    disabled={isAnyWindowOpen}
-                  />
-                </div>
-                <div className="w-20 text-right text-xs text-muted-foreground">
-                  <div className="font-medium truncate">{currentSession?.name}</div>
-                  <div>{currentSession?.times.length || 0} solves</div>
-                </div>
-              </div>
+            <div className="w-20 text-right text-xs text-muted-foreground">
+              <div className="font-medium truncate">{currentSession?.name}</div>
+              <div>{currentSession?.times.length || 0} solves</div>
             </div>
           </div>
-        ) : (
-          <HistoryTab
-            sessions={sessions}
-            currentSessionId={currentSessionId}
-            onSessionChange={handleSessionChange}
-            onCreateSession={handleCreateSession}
-            onRenameSession={handleRenameSession}
-            onDeleteSession={handleDeleteSession}
-            onPlusTwo={handleHistoryPlusTwo}
-            onDNF={handleHistoryDNF}
-            onDelete={handleHistoryDelete}
-          />
-        )}
+        </div>
       </div>
+    ) : (
+      <div className="flex-1 overflow-hidden">
+        <HistoryTab
+          sessions={sessions}
+          currentSessionId={currentSessionId}
+          onSessionChange={handleSessionChange}
+          onCreateSession={handleCreateSession}
+          onRenameSession={handleRenameSession}
+          onDeleteSession={handleDeleteSession}
+          onPlusTwo={handleHistoryPlusTwo}
+          onDNF={handleHistoryDNF}
+          onDelete={handleHistoryDelete}
+        />
+      </div>
+    )}
+  </div>
 
-      <div className="h-12">
-        <UniversalNavigation activeTab={activeTab} onTabChange={setActiveTab} />
-      </div>
-    </div>
+  <div className="h-12 overflow-hidden">
+    <UniversalNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+  </div>
+</div>
   );
 };
 

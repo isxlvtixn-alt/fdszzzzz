@@ -27,11 +27,13 @@ export const useTimer = (
 ): TimerHookResult => {
   const [time, setTime] = useState(0);
   const [inspectionTimeLeft, setInspectionTime] = useState<number | null>(null);
-  const [currentState, setCurrentState] = useState<TimerState>("ready");
+  const [currentState, setCurrentState] = useState<TimerState>("stopped");
   const [startTime, setStartTime] = useState<number | null>(null);
   const [isSpacePressed, setIsSpacePressed] = useState(false);
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const lastStartRef = useRef<number>(Date.now()); // блокировка после stop
+  const inspectionStartRef = useRef<number | null>(null); // блокировка на 1 сек при инспекции
 
   const settings: TimerSettings = timerSettings || {
     useInspection: false,
@@ -40,7 +42,7 @@ export const useTimer = (
     hideTimeWhileSolving: false,
   };
 
-  // Timer update loop
+  // Таймер обновления
   useEffect(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
 
@@ -67,43 +69,66 @@ export const useTimer = (
     };
   }, [currentState, startTime, inspectionTimeLeft, onInspectionTimeout]);
 
-  // Universal press handler
+  // Обработчик нажатия (start/stop)
   const handleTimerPress = useCallback(() => {
+    const now = Date.now();
+
     if (currentState === "running") {
-      // Stop timer
+      // стоп таймера с задержкой <0.5 сек блокируется
+      if (time < 100) return;
       setCurrentState("stopped");
       onTimeRecord(time);
+      lastStartRef.current = now;
     } else if (currentState === "stopped") {
-      // Reset timer
+      // сброс таймера
+      if (now - lastStartRef.current < 500) return; // блок 0.5 сек после стопа
       setCurrentState("ready");
       setTime(0);
       setStartTime(null);
       setInspectionTime(null);
-    }
-  }, [currentState, time, onTimeRecord]);
+    } else if (currentState === "ready") {
+      // блокировка старта таймера на 0.5 сек после stop
+      if (now - lastStartRef.current < 500) return;
 
-  // Universal release handler
+      if (settings.useInspection) {
+        setCurrentState("inspection");
+        setInspectionTime(settings.inspectionTime * 1000);
+        inspectionStartRef.current = now;
+      } else {
+        setCurrentState("running");
+        setStartTime(now);
+        setTime(0);
+      }
+    }
+  }, [currentState, time, onTimeRecord, settings.useInspection, settings.inspectionTime]);
+
+  // Обработчик отпускания таймера (run после inspection)
   const handleTimerRelease = useCallback(() => {
+    const now = Date.now();
+
     if (currentState === "ready") {
       if (settings.useInspection) {
         setCurrentState("inspection");
         setInspectionTime(settings.inspectionTime * 1000);
+        inspectionStartRef.current = now;
       } else {
         setCurrentState("running");
-        const now = Date.now();
         setStartTime(now);
         setTime(0);
       }
     } else if (currentState === "inspection") {
+      // блокировка на первую секунду инспекции
+      if (inspectionStartRef.current && now - inspectionStartRef.current < 1000) return;
+
       setCurrentState("running");
-      const now = Date.now();
       setStartTime(now);
       setTime(0);
       setInspectionTime(null);
+      inspectionStartRef.current = null;
     }
   }, [currentState, settings.useInspection, settings.inspectionTime]);
 
-  // Keyboard controls
+  // Контрол клавиатуры
   useEffect(() => {
     if (disabled) return;
 

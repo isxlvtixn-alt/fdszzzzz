@@ -9,7 +9,7 @@ import { Menu, Palette, Eye, Volume2, Box } from 'lucide-react';
 interface AppSettings {
   inspection: boolean;
   inspectionTime: number;
-  hideTimeWhileSolving: boolean;
+  hideTime: boolean;   // <-- единое название
   sounds: boolean;
   scrambleView: '2D' | '3D';
   theme: string;
@@ -105,9 +105,9 @@ export const MenuSettings = ({ settings, onSettingsChange, disabled, onOpenChang
                 </div>
                 <Switch
                   id="hide-time"
-                  checked={settings.hideTimeWhileSolving}
+                  checked={settings.hideTime}
                   onCheckedChange={(checked) => 
-                    onSettingsChange({ hideTimeWhileSolving: checked })
+                    onSettingsChange({ hideTime: checked })
                   }
                 />
               </div>
