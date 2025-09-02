@@ -188,16 +188,10 @@ export const MenuSettings = ({ settings, onSettingsChange, disabled, onOpenChang
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="dark">Dark</SelectItem>
                     <SelectItem value="blue">Blue</SelectItem>
                     <SelectItem value="green">Green</SelectItem>
-                    <SelectItem value="purple">Purple</SelectItem>
-                    <SelectItem value="orange">Orange</SelectItem>
-                    <SelectItem value="red">Red</SelectItem>
-                    <SelectItem value="cyan">Cyan</SelectItem>
                     <SelectItem value="pink">Pink</SelectItem>
                     <SelectItem value="amber">Amber</SelectItem>
-                    <SelectItem value="indigo">Indigo</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

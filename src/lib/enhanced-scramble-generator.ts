@@ -1,125 +1,90 @@
 /**
- * Enhanced scramble generator 
- * Supports multiple WCA events with proper scramble algorithms
+ * WCA-grade scramble generator (csTimer-like) via scrambow
+ * npm i scrambow
  */
+import { Scrambow, type Scramble } from 'scrambow';
 
+/** Supported events & mapping to scrambow types */
 export const CUBE_EVENTS = [
-  { id: '3x3', name: '3×3×3', scrambleLength: 20, event: '333' },
-  { id: '2x2', name: '2×2×2', scrambleLength: 9, event: '222' },
-  { id: '4x4', name: '4×4×4', scrambleLength: 40, event: '444' },
-  { id: '5x5', name: '5×5×5', scrambleLength: 60, event: '555' },
-  { id: '6x6', name: '6×6×6', scrambleLength: 80, event: '666' },
-  { id: '7x7', name: '7×7×7', scrambleLength: 100, event: '777' },
-  { id: 'oh', name: '3×3 One-Handed', scrambleLength: 20, event: '333oh' },
-  { id: 'bld', name: '3×3 Blindfolded', scrambleLength: 20, event: '333bf' },
-  { id: 'fmc', name: 'Fewest Moves', scrambleLength: 1, event: '333fm' },
-  { id: 'clock', name: 'Clock', scrambleLength: 1, event: 'clock' },
-  { id: 'mega', name: 'Megaminx', scrambleLength: 70, event: 'minx' },
-  { id: 'pyra', name: 'Pyraminx', scrambleLength: 10, event: 'pyram' },
-  { id: 'skewb', name: 'Skewb', scrambleLength: 10, event: 'skewb' },
-  { id: 'sq1', name: 'Square-1', scrambleLength: 15, event: 'sq1' },
+  { id: '3x3',  name: '3×3×3',  event: '333' },
+  { id: '2x2',  name: '2×2×2',  event: '222' },
+  { id: '4x4',  name: '4×4×4',  event: '444' },
+  { id: '5x5',  name: '5×5×5',  event: '555' },
+  { id: '6x6',  name: '6×6×6',  event: '666' },
+  { id: '7x7',  name: '7×7×7',  event: '777' },
+  { id: 'pyra', name: 'Pyraminx', event: 'pyram' },
+  { id: 'skewb',name: 'Skewb',    event: 'skewb' },
+  { id: 'mega', name: 'Megaminx', event: 'minx' },
+  { id: 'sq1',  name: 'Square-1', event: 'sq1' },
+  { id: 'clock',name: 'Clock',    event: 'clock' },
 ] as const;
 
-/**
- * Generate scramble using scrambow for better quality scrambles
- */
-export const generateEnhancedScramble = (cubeType: string): string => {
+type CubeId = typeof CUBE_EVENTS[number]['id'];
+
+export const getScrambleInfo = (cubeType: CubeId) =>
+  CUBE_EVENTS.find(e => e.id === cubeType) ??
+  CUBE_EVENTS.find(e => e.id === '3x3')!; // корректный дефолт — 3x3
+
+/** Main: generate a WCA-compliant scramble */
+export const generateEnhancedScramble = (cubeType: CubeId, opts?: { seed?: number }) => {
+  const info = getScrambleInfo(cubeType);
+
   try {
-    // For now, use the enhanced basic scramble generator
-    // Future: Integrate with scrambow when properly configured
-    return generateBasicScramble(cubeType);
-  } catch (error) {
-    console.error('Error generating scramble:', error);
-    // Fallback scramble
-    return generateBasicScramble(cubeType);
+    const list = new Scrambow()
+      .setType(info.event)          // важный момент — используем event-код ('444', 'minx', 'sq1' ...)
+      .setSeed(opts?.seed)
+      .get(1) as Scramble[] | any;
+
+    const first = Array.isArray(list) ? list[0] : list;
+    // старые/кастомные типы могут вернуть по-разному
+    return (first.scramble_string ?? first.scramble ?? String(first)) as string;
+  } catch (e) {
+    console.error('scrambow failed, fallback:', e);
+    return fallbackScramble(cubeType); // dev/offline fallback
   }
 };
 
-/**
- * Enhanced basic scramble generator
- */
-const generateBasicScramble = (cubeType: string): string => {
-  const event = CUBE_EVENTS.find(e => e.id === cubeType);
-  const length = event?.scrambleLength || 20;
-  
-  // Different move sets for different puzzles
-  let moves: string[];
-  let modifiers: string[];
-  
-  switch (cubeType) {
-    case '2x2':
-      moves = ['R', 'U', 'F'];
-      modifiers = ['', "'", '2'];
-      break;
-    case 'pyra':
-      moves = ['R', 'L', 'U', 'B'];
-      modifiers = ['', "'"];
-      break;
-    case 'skewb':
-      moves = ['R', 'L', 'U', 'B'];
-      modifiers = ['', "'"];
-      break;
-    case 'mega':
-      moves = ['R++', 'R--', 'D++', 'D--', 'U'];
-      modifiers = ['', "'"];
-      break;
-    case 'sq1':
-      // Square-1 has special notation
-      return generateSquare1Scramble();
-    default:
-      moves = ['R', 'L', 'U', 'D', 'F', 'B'];
-      modifiers = ['', "'", '2'];
+/** Very simple fallback for offline/dev (не WCA-точный, только чтобы не падало) */
+const fallbackScramble = (cubeType: CubeId): string => {
+  if (cubeType === 'sq1') return generateSquare1Fallback();
+  const pool =
+    cubeType === '2x2' ? ['R', 'U', 'F']
+    : cubeType === 'pyra' || cubeType === 'skewb' ? ['R', 'L', 'U', 'B']
+    : ['R', 'L', 'U', 'D', 'F', 'B'];
+
+  const mods = ['', "'", '2'];
+  const len =
+    cubeType === '2x2' ? 9
+    : cubeType === '3x3' ? 20
+    : cubeType === '4x4' ? 40
+    : cubeType === '5x5' ? 60
+    : cubeType === '6x6' ? 80
+    : cubeType === '7x7' ? 100
+    : cubeType === 'mega' ? 70
+    : 25;
+
+  const out: string[] = [];
+  let last = '', prev = '';
+  for (let i = 0; i < len; i++) {
+    let m = '';
+    for (let tries = 0; tries < 50; tries++) {
+      m = pool[Math.floor(Math.random() * pool.length)];
+      if (m !== last && !(m === prev && last === prev)) break;
+    }
+    const mod = mods[Math.floor(Math.random() * mods.length)];
+    out.push(m + mod);
+    prev = last; last = m;
   }
-  
-  const scramble: string[] = [];
-  let lastMove = '';
-  let lastTwoMoves = ['', ''];
-  
-  for (let i = 0; i < length; i++) {
-    let move;
-    let attempts = 0;
-    do {
-      move = moves[Math.floor(Math.random() * moves.length)];
-      attempts++;
-      if (attempts > 50) break; // Prevent infinite loop
-    } while (
-      move === lastMove || 
-      (move === lastTwoMoves[1] && lastMove === lastTwoMoves[0])
-    );
-    
-    const modifier = modifiers[Math.floor(Math.random() * modifiers.length)];
-    scramble.push(move + modifier);
-    
-    lastTwoMoves[0] = lastTwoMoves[1];
-    lastTwoMoves[1] = lastMove;
-    lastMove = move;
-  }
-  
-  return scramble.join(' ');
+  return out.join(' ');
 };
 
-/**
- * Generate Square-1 scramble with proper notation
- */
-const generateSquare1Scramble = (): string => {
-  const scramble: string[] = [];
-  
+const generateSquare1Fallback = (): string => {
+  const s: string[] = [];
   for (let i = 0; i < 15; i++) {
     const top = Math.floor(Math.random() * 12) - 6;
-    const bottom = Math.floor(Math.random() * 12) - 6;
-    scramble.push(`(${top}, ${bottom})`);
-    
-    if (i < 14) {
-      scramble.push('/');
-    }
+    const bot = Math.floor(Math.random() * 12) - 6;
+    s.push(`(${top},${bot})`);
+    if (i < 14) s.push('/');
   }
-  
-  return scramble.join(' ');
-};
-
-/**
- * Get scramble info for a cube type
- */
-export const getScrambleInfo = (cubeType: string) => {
-  return CUBE_EVENTS.find(e => e.id === cubeType) || CUBE_EVENTS[0];
+  return s.join(' ');
 };
