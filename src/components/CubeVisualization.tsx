@@ -45,7 +45,7 @@ export const CubeVisualization = ({
       const puzzleId = TWISTY_PUZZLES[cubeType] || '3x3x3';
 
       const player = new TwistyPlayer({
-        puzzle: puzzleId,
+        puzzle: puzzleId as any,
         alg: scramble,
         visualization: viewMode,
         background: 'none',

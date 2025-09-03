@@ -230,8 +230,9 @@ const timerSettings: TimerSettings = {
         <TopBar
           scramble={scramble}
           cubeType={cubeType}
-          onNewScramble={() => setScramble(generateEnhancedScramble(cubeType))}
+          onNewScramble={() => setScramble(generateEnhancedScramble(cubeType as any))}
           onCubeTypeChange={setCubeType}
+          onCustomScramble={setScramble}
           disabled={isAnyWindowOpen}
         />
 

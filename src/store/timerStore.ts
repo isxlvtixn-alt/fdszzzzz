@@ -47,6 +47,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   inspectionTime: 15,
   sounds: false,
   soundVolume: 0.5,
+  scrambleView: '2D',
 };
 
 export const useTimerStore = create<TimerStore>()(
