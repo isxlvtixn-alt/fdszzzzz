@@ -29,9 +29,9 @@ export const TopBar = ({ scramble, cubeType, onNewScramble, onCubeTypeChange, on
 
   return (
     <div className="flex flex-col gap-2 p-4">
-      {/* Scramble Display - Fixed height with vertical scrolling and text wrapping */}
-      <div className="bg-card/50 rounded-lg border border-border/50 h-20">
-        <div className="p-3 h-full overflow-y-auto">
+      {/* Scramble Display - Enhanced glass container */}
+      <div className="container-frame rounded-lg h-20 hover-lift transition-glow">
+        <div className="p-3 h-full overflow-y-auto scrollbar-modern">
           <p className="font-mono text-base text-foreground/90 leading-relaxed break-words">
             {scramble || 'Press refresh to generate scramble'}
           </p>
@@ -45,7 +45,7 @@ export const TopBar = ({ scramble, cubeType, onNewScramble, onCubeTypeChange, on
           variant="ghost"
           size="sm"
           onClick={onNewScramble}
-          className="h-8 w-8 p-0"
+          className="h-8 w-8 p-0 glow-primary transition-glow hover:scale-105"
           disabled={disabled}
         >
           <RefreshCw className="h-4 w-4" />
@@ -57,13 +57,13 @@ export const TopBar = ({ scramble, cubeType, onNewScramble, onCubeTypeChange, on
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 w-8 p-0"
+              className="h-8 w-8 p-0 glow-primary transition-glow hover:scale-105"
               disabled={disabled}
             >
               <Edit3 className="h-4 w-4" />
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent className="sm:max-w-md container-frame">
             <DialogHeader>
               <DialogTitle>Custom Scramble</DialogTitle>
             </DialogHeader>
@@ -72,7 +72,7 @@ export const TopBar = ({ scramble, cubeType, onNewScramble, onCubeTypeChange, on
                 placeholder="Enter your custom scramble..."
                 value={customScrambleText}
                 onChange={(e) => setCustomScrambleText(e.target.value)}
-                className="min-h-[100px]"
+                className="min-h-[100px] input-glass transition-glow"
               />
               <div className="flex gap-2 justify-end">
                 <Button
@@ -81,10 +81,11 @@ export const TopBar = ({ scramble, cubeType, onNewScramble, onCubeTypeChange, on
                     setIsCustomDialogOpen(false);
                     setCustomScrambleText('');
                   }}
+                  className="transition-glow"
                 >
                   Cancel
                 </Button>
-                <Button onClick={handleCustomScrambleSubmit}>
+                <Button onClick={handleCustomScrambleSubmit} className="btn-primary">
                   Apply
                 </Button>
               </div>
@@ -94,13 +95,13 @@ export const TopBar = ({ scramble, cubeType, onNewScramble, onCubeTypeChange, on
 
         {/* Cube Type Selector */}
         <Select value={cubeType} onValueChange={onCubeTypeChange} disabled={disabled}>
-          <SelectTrigger className="w-auto h-8 gap-2 bg-card/50 border-border/50">
+          <SelectTrigger className="w-auto h-8 gap-2 container-frame-subtle transition-glow hover:scale-105">
             <Box className="h-4 w-4" />
             <SelectValue />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="container-frame">
             {CUBE_EVENTS.map((event) => (
-              <SelectItem key={event.id} value={event.id}>
+              <SelectItem key={event.id} value={event.id} className="hover-lift">
                 {event.name}
               </SelectItem>
             ))}

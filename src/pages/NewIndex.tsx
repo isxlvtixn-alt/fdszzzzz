@@ -211,7 +211,7 @@ const timerSettings: TimerSettings = {
     {activeTab === 'timer' ? (
       <div className="flex flex-col h-full overflow-hidden">
         {/* Top panel */}
-        <div className="flex items-center justify-between border-b border-border/50 p-4">
+        <div className="container-frame-subtle flex items-center justify-between p-4">
           <MenuSettings
             settings={{
               inspection: appSettings.inspection,
@@ -264,7 +264,8 @@ const timerSettings: TimerSettings = {
         </div>
 
         {/* Bottom panel */}
-        <div className="border-t border-border/50 bg-card/30">
+        <div className="container-frame-subtle">
+          <div className="section-divider mb-3"></div>
           <div className="flex items-center justify-between p-3 h-17 overflow-hidden">
             <div className="w-20">
               <BottomStats times={currentSession?.times ?? []} />

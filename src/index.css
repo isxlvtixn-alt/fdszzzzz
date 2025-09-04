@@ -356,6 +356,51 @@ All colors MUST be HSL.
     background: var(--gradient-bg);
     min-height: 100vh;
   }
+
+  /* Container frame improvements */
+  .container-frame {
+    background: var(--gradient-card);
+    border: 1px solid hsl(var(--border));
+    backdrop-filter: blur(var(--blur-card));
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .container-frame-subtle {
+    background: hsl(var(--card) / 0.3);
+    border: 1px solid hsl(var(--border) / 0.3);
+    backdrop-filter: blur(8px);
+  }
+
+  .container-frame-invisible {
+    background: transparent;
+    border: none;
+    backdrop-filter: none;
+  }
+
+  /* Section dividers - subtle instead of harsh lines */
+  .section-divider {
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      hsl(var(--border) / 0.3) 20%, 
+      hsl(var(--border) / 0.5) 50%, 
+      hsl(var(--border) / 0.3) 80%, 
+      transparent 100%
+    );
+    height: 1px;
+    border: none;
+  }
+
+  .section-divider-vertical {
+    background: linear-gradient(180deg, 
+      transparent 0%, 
+      hsl(var(--border) / 0.3) 20%, 
+      hsl(var(--border) / 0.5) 50%, 
+      hsl(var(--border) / 0.3) 80%, 
+      transparent 100%
+    );
+    width: 1px;
+    border: none;
+  }
 }
 
 @layer components {
