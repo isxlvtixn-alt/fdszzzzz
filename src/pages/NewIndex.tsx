@@ -63,14 +63,14 @@ const timerSettings: TimerSettings = {
   const handleInspectionTimeout = () => {
     const time = 0; // DNF time
     addTime(time, scramble, true); // true for autoDnf
-    setScramble(generateEnhancedScramble(cubeType));
+    setScramble(generateEnhancedScramble(cubeType as any));
     setToast({ message: 'DNF - Inspection timeout', type: 'error' });
   };
 
   // Handle time recording
   const handleTimeRecord = (time: number) => {
     addTime(time, scramble);
-    setScramble(generateEnhancedScramble(cubeType));
+    setScramble(generateEnhancedScramble(cubeType as any));
     playStop();
     setToast({ message: 'Time recorded!', type: 'success' });
   };
@@ -84,7 +84,7 @@ const timerSettings: TimerSettings = {
       createSession(`${cubeType} Session`, cubeType);
     }
     if (!scramble) {
-      setScramble(generateEnhancedScramble(cubeType));
+      setScramble(generateEnhancedScramble(cubeType as any));
     }
   }, [sessions.length, scramble, cubeType, createSession, setScramble]);
 
@@ -179,7 +179,7 @@ const timerSettings: TimerSettings = {
 
   // Scramble generation when cube type changes
   useEffect(() => {
-    setScramble(generateEnhancedScramble(cubeType));
+    setScramble(generateEnhancedScramble(cubeType as any));
   }, [cubeType, setScramble]);
 
   // Sound effects
@@ -273,7 +273,7 @@ const timerSettings: TimerSettings = {
               <BottomVisualization
                 scramble={scramble}
                 cubeType={cubeType}
-                viewMode={appSettings.scrambleView as '2D' | '3D'}
+                viewMode={appSettings.scrambleView}
                 disabled={isAnyWindowOpen}
               />
             </div>

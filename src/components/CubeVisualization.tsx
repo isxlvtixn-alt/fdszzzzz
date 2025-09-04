@@ -47,7 +47,7 @@ export const CubeVisualization = ({
       const player = new TwistyPlayer({
         puzzle: puzzleId as any,
         alg: scramble,
-        visualization: viewMode,
+        visualization: viewMode === '3D' ? '3D' : '2D',
         background: 'none',
         controlPanel: 'none',
         hintFacelets: 'none',
