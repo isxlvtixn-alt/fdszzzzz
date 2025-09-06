@@ -202,6 +202,7 @@
 }
 
 [data-theme="dark"] [role="menu"],
+[data-theme="dark"] [role="combobox"],
 [data-theme="dark"] [data-radix-select-content],
 [data-theme="dark"] [data-radix-dropdown-menu-content] {
   background: linear-gradient(145deg, hsl(0 0% 12% / .95), hsl(0 0% 8% / .9)) !important;
@@ -216,15 +217,18 @@
 }
 
 [data-theme="dark"] [role="menuitem"],
+[data-theme="dark"] [role="combobox"],
 [data-theme="dark"] [data-radix-select-item],
 [data-theme="dark"] [data-radix-dropdown-menu-item] {
   color: hsl(0 0% 90%) !important;
 }
 
 [data-theme="dark"] [role="menuitem"]:hover,
+[data-theme="dark"] [role="combobox"]:hover,
 [data-theme="dark"] [data-radix-select-item]:hover,
 [data-theme="dark"] [data-radix-dropdown-menu-item]:hover,
 [data-theme="dark"] [role="menuitem"][data-highlighted],
+[data-theme="dark"] [role="combobox"][data-highlighted],
 [data-theme="dark"] [data-radix-select-item][data-highlighted],
 [data-theme="dark"] [data-radix-dropdown-menu-item][data-highlighted] {
   background: hsl(0 0% 18% / .8) !important;
@@ -237,6 +241,7 @@
 }
 
 [data-theme="neon"] [role="menu"],
+[data-theme="neon"] [role="combobox"],
 [data-theme="neon"] [data-radix-select-content],
 [data-theme="neon"] [data-radix-dropdown-menu-content] {
   background: linear-gradient(145deg, hsl(265 40% 15% / .95), hsl(280 50% 10% / .9)) !important;
@@ -251,15 +256,18 @@
 }
 
 [data-theme="neon"] [role="menuitem"],
+[data-theme="neon"] [role="combobox"],
 [data-theme="neon"] [data-radix-select-item],
 [data-theme="neon"] [data-radix-dropdown-menu-item] {
   color: hsl(270 70% 88%) !important;
 }
 
 [data-theme="neon"] [role="menuitem"]:hover,
+[data-theme="neon"] [role="combobox"]:hover,
 [data-theme="neon"] [data-radix-select-item]:hover,
 [data-theme="neon"] [data-radix-dropdown-menu-item]:hover,
 [data-theme="neon"] [role="menuitem"][data-highlighted],
+[data-theme="neon"] [role="combobox"][data-highlighted],
 [data-theme="neon"] [data-radix-select-item][data-highlighted],
 [data-theme="neon"] [data-radix-dropdown-menu-item][data-highlighted] {
   background: hsl(280 60% 20% / .8) !important;
