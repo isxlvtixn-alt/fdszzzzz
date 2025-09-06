@@ -2,550 +2,253 @@
 @tailwind components;
 @tailwind utilities;
 
-/* =======================================================================
-   BASE + LIGHT (Premium Calm)
-   - Мягкий многослойный фон (лаванда → небо → персик)
-   - Стеклянные поверхности с деликатным блик-контуром
-   - Статусы алертов с гарантированным контрастом
-======================================================================= */
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
 @layer base {
   :root {
-    /* Core tokens */
-    --background: 0 0% 100%;
-    --foreground: 220 25% 12%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 220 25% 12%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 25% 12%;
-
-    --primary: 220 90% 55%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 220 15% 96%;
-    --secondary-foreground: 220 25% 15%;
-
-    --muted: 220 15% 96%;
-    --muted-foreground: 220 10% 40%;
-
-    --accent: 260 55% 88%;
-    --accent-foreground: 230 35% 20%;
-
-    --destructive: 0 78% 54%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 220 20% 90%;
-    --input: 220 20% 92%;
-    --ring: 220 90% 55%;
-
-    --radius: 1rem;
-
-    /* Status palette (HSL triples) */
-    --info: 216 92% 55%;
-    --info-fg-soft: 220 35% 18%;
-    --info-fg-solid: 210 100% 98%;
-
-    --success: 151 55% 38%;
-    --success-fg-soft: 156 25% 16%;
-    --success-fg-solid: 140 100% 96%;
-
-    --warning: 35 100% 50%;
-    --warning-fg-soft: 28 50% 18%;
-    --warning-fg-solid: 52 100% 98%;
-
-    --error: 0 75% 54%;
-    --error-fg-soft: 350 45% 18%;
-    --error-fg-solid: 0 100% 98%;
-
-    --neutral: 220 10% 45%;
-    --neutral-fg-soft: 220 25% 18%;
-    --neutral-fg-solid: 0 0% 100%;
-
-    /* Visual constants */
-    --alpha-soft: .14;      /* плотность soft-фона для алертов */
-    --alpha-outline: .28;   /* непрозр. границы для outline */
-    --blur-card: 18px;
-
-    /* Premium shadows */
-    --shadow-card: 0 6px 24px -6px hsl(220 40% 30% / .12);
-    --shadow-button: 0 4px 16px -4px hsl(220 60% 40% / .22);
-    --shadow-hover: 0 8px 28px -8px hsl(220 60% 40% / .28);
-
-    /* Timing */
-    --ease-smooth: cubic-bezier(.4, 0, .2, 1);
-    --ease-snappy: cubic-bezier(.22, 1, .36, 1);
-
-    /* Multi-layer calming background */
-    --gradient-bg:
-      radial-gradient(1200px 800px at 15% 10%, hsl(260 100% 97% / .85), transparent 60%),
-      radial-gradient(1000px 700px at 85% 15%, hsl(195 70% 95% / .85), transparent 55%),
-      radial-gradient(900px 600px at 50% 100%, hsl(30 100% 96% / .85), transparent 60%),
-      linear-gradient(180deg, hsl(0 0% 100%), hsl(220 20% 97%));
-
-    /* Card gradient + button gradient */
-    --gradient-card: linear-gradient(135deg, hsl(0 0% 100%), hsl(220 25% 97%));
-    --gradient-button: linear-gradient(90deg, hsl(220 90% 60%), hsl(220 80% 50%));
-
-    /* Subtle noise */
-    --noise-overlay: url("data:image/svg+xml;utf8,\
-<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'>\
-<filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/></filter>\
-<rect width='100%' height='100%' filter='url(#n)' opacity='0.03'/></svg>");
+    /* Default dark theme */
+    --background: 220 30% 3%;
+    --foreground: 210 40% 98%;
+    --card: 220 20% 8%;
+    --card-foreground: 210 40% 98%;
+    --popover: 220 20% 8%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 142 76% 36%;
+    --primary-foreground: 220 25% 6%;
+    --secondary: 220 15% 12%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 220 15% 12%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 204 100% 50%;
+    --accent-foreground: 220 25% 6%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 220 15% 15%;
+    --input: 220 15% 15%;
+    --ring: 142 76% 36%;
+    --timer-ready: 142 76% 36%;
+    --timer-running: 204 100% 50%;
+    --timer-stopped: 39 96% 59%;
+    --timer-inspection: 0 84% 60%;
+    --gradient-primary: linear-gradient(135deg, hsl(142 76% 36%), hsl(180 100% 25%));
+    --gradient-accent: linear-gradient(135deg, hsl(204 100% 50%), hsl(220 100% 60%));
+    --gradient-bg: linear-gradient(180deg, hsl(220 25% 6%), hsl(220 20% 8%));
+    --shadow-timer: 0 20px 60px -12px hsl(142 76% 36% / 0.4);
+    --shadow-card: 0 4px 24px -4px hsl(220 25% 6% / 0.8);
+    --shadow-glow: 0 0 40px hsl(142 76% 36% / 0.3);
+    --radius: 0.5rem;
   }
 
-  * { @apply border-border; }
+  /* Blue theme */
+  [data-theme="blue"] {
+    --primary: 217 91% 60%;
+    --primary-foreground: 220 25% 6%;
+    --accent: 204 100% 50%;
+    --timer-ready: 217 91% 60%;
+    --ring: 217 91% 60%;
+    --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(204 100% 50%));
+    --shadow-timer: 0 20px 60px -12px hsl(217 91% 60% / 0.4);
+    --shadow-glow: 0 0 40px hsl(217 91% 60% / 0.3);
+  }
+
+  /* Green theme */
+  [data-theme="green"] {
+    --primary: 120 60% 50%;
+    --primary-foreground: 220 25% 6%;
+    --accent: 150 100% 40%;
+    --timer-ready: 120 60% 50%;
+    --ring: 120 60% 50%;
+    --gradient-primary: linear-gradient(135deg, hsl(120 60% 50%), hsl(150 100% 40%));
+    --shadow-timer: 0 20px 60px -12px hsl(120 60% 50% / 0.4);
+    --shadow-glow: 0 0 40px hsl(120 60% 50% / 0.3);
+  }
+
+  /* Purple theme */
+  [data-theme="purple"] {
+    --primary: 270 95% 75%;
+    --primary-foreground: 220 25% 6%;
+    --accent: 290 100% 60%;
+    --timer-ready: 270 95% 75%;
+    --ring: 270 95% 75%;
+    --gradient-primary: linear-gradient(135deg, hsl(270 95% 75%), hsl(290 100% 60%));
+    --shadow-timer: 0 20px 60px -12px hsl(270 95% 75% / 0.4);
+    --shadow-glow: 0 0 40px hsl(270 95% 75% / 0.3);
+  }
+
+  /* Orange theme */
+  [data-theme="orange"] {
+    --primary: 30 100% 50%;
+    --primary-foreground: 220 25% 6%;
+    --accent: 45 100% 60%;
+    --timer-ready: 30 100% 50%;
+    --ring: 30 100% 50%;
+    --gradient-primary: linear-gradient(135deg, hsl(30 100% 50%), hsl(45 100% 60%));
+    --shadow-timer: 0 20px 60px -12px hsl(30 100% 50% / 0.4);
+    --shadow-glow: 0 0 40px hsl(30 100% 50% / 0.3);
+  }
+
+  /* Red theme */
+  [data-theme="red"] {
+    --primary: 0 75% 55%;
+    --primary-foreground: 220 25% 6%;
+    --accent: 15 85% 65%;
+    --timer-ready: 0 75% 55%;
+    --ring: 0 75% 55%;
+    --gradient-primary: linear-gradient(135deg, hsl(0 75% 55%), hsl(15 85% 65%));
+    --shadow-timer: 0 20px 60px -12px hsl(0 75% 55% / 0.4);
+    --shadow-glow: 0 0 40px hsl(0 75% 55% / 0.3);
+  }
+
+  /* Cyan theme */
+  [data-theme="cyan"] {
+    --primary: 190 100% 45%;
+    --primary-foreground: 220 25% 6%;
+    --accent: 175 100% 50%;
+    --timer-ready: 190 100% 45%;
+    --ring: 190 100% 45%;
+    --gradient-primary: linear-gradient(135deg, hsl(190 100% 45%), hsl(175 100% 50%));
+    --shadow-timer: 0 20px 60px -12px hsl(190 100% 45% / 0.4);
+    --shadow-glow: 0 0 40px hsl(190 100% 45% / 0.3);
+  }
+
+  /* Pink theme */
+  [data-theme="pink"] {
+    --primary: 330 85% 65%;
+    --primary-foreground: 220 25% 6%;
+    --accent: 315 100% 70%;
+    --timer-ready: 330 85% 65%;
+    --ring: 330 85% 65%;
+    --gradient-primary: linear-gradient(135deg, hsl(330 85% 65%), hsl(315 100% 70%));
+    --shadow-timer: 0 20px 60px -12px hsl(330 85% 65% / 0.4);
+    --shadow-glow: 0 0 40px hsl(330 85% 65% / 0.3);
+  }
+
+  /* Amber theme */
+  [data-theme="amber"] {
+    --primary: 45 95% 55%;
+    --primary-foreground: 220 25% 6%;
+    --accent: 35 100% 60%;
+    --timer-ready: 45 95% 55%;
+    --ring: 45 95% 55%;
+    --gradient-primary: linear-gradient(135deg, hsl(45 95% 55%), hsl(35 100% 60%));
+    --shadow-timer: 0 20px 60px -12px hsl(45 95% 55% / 0.4);
+    --shadow-glow: 0 0 40px hsl(45 95% 55% / 0.3);
+  }
+
+  /* Indigo theme */
+  [data-theme="indigo"] {
+    --primary: 235 85% 65%;
+    --primary-foreground: 220 25% 6%;
+    --accent: 245 85% 70%;
+    --timer-ready: 235 85% 65%;
+    --ring: 235 85% 65%;
+    --gradient-primary: linear-gradient(135deg, hsl(235 85% 65%), hsl(245 85% 70%));
+    --shadow-timer: 0 20px 60px -12px hsl(235 85% 65% / 0.4);
+    --shadow-glow: 0 0 40px hsl(235 85% 65% / 0.3);
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
 
   body {
-    background: var(--gradient-bg) fixed;
-    color: hsl(var(--foreground));
-    animation: fadeIn .8s var(--ease-smooth) both;
-    position: relative;
-    min-height: 100dvh;
+    @apply bg-background text-foreground;
+    background: var(--gradient-bg);
+    min-height: 100vh;
   }
-
-  body::after{
-    content:"";
-    position: fixed; inset: 0;
-    pointer-events: none;
-    background-image: var(--noise-overlay);
-    z-index: 0;
-  }
-
-  @keyframes fadeIn { from {opacity:0; transform:scale(1.01)} to {opacity:1; transform:scale(1)} }
-
-  @media (prefers-reduced-motion: reduce){
-    * { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
-  }
-}
-
-/* =======================================================================
-   COMPONENTS (универсальные стили, затем темы переопределяют токены)
-======================================================================= */
-@layer components {
-	/* ---------- Scramble container ---------- */
-.scramble-container {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start; /* <-- прижали к верху */
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum";
-
-  font-size: 1.35rem; /* крупнее для удобства чтения */
-  line-height: 1;
-  font-weight: 500;
-  text-align: center;
-
-  padding: 0.5rem 1.5rem 0.75rem; /* сверху чуть меньше, снизу — тонкий воздух */
-  max-width: 90%;
-  margin-inline: auto;
-}
-
-/* Neon glow */
-[data-theme="neon"] .scramble-container {
-  text-shadow: 0 0 8px hsl(280 100% 65% / .8),
-               0 0 14px hsl(260 100% 65% / .6);
-}
-
-/* Dark subtle glow */
-[data-theme="dark"] .scramble-container {
-  text-shadow: 0 0 6px rgb(255 255 255 / .15);
-}
-
-/* Adaptive for small screens */
-@media (max-width: 640px) {
-  .scramble-container {
-    font-size: 1.35rem;
-    padding: 0.5rem 1rem 0.75rem;
-  }
-}
-
-
-  /* ---------- Premium button ---------- */
-  .btn-primary{
-    background: var(--gradient-button);
-    color: var(--primary-foreground);
-    font-weight: 500;
-    border-radius: var(--radius);
-    padding: .65rem 1.25rem;
-    box-shadow: var(--shadow-button);
-    transition: all .35s var(--ease-snappy);
-    position: relative;
-    overflow: hidden;
-    z-index: 1;
-  }
-  .btn-primary::before{
-    content:""; position:absolute; inset:0;
-    background: linear-gradient(120deg, rgb(255 255 255 / .35) 0%, transparent 60%);
-    transform: translateX(-100%); transition: transform .6s var(--ease-smooth);
-  }
-  .btn-primary:hover::before{ transform: translateX(100%); }
-  .btn-primary:hover{ box-shadow: var(--shadow-hover), 0 0 24px hsl(var(--primary) / .4); transform: translateY(-2px); }
-  .btn-primary:focus-visible{ outline: none; box-shadow: 0 0 0 3px hsl(var(--ring)/.5), var(--shadow-hover); }
-
-  /* ---------- Glass surfaces ---------- */
-.glass, .timer-card {
-  background: var(--gradient-card);
-  border-radius: var(--radius);
-  backdrop-filter: blur(var(--blur-card));
-  -webkit-backdrop-filter: blur(var(--blur-card));
-  box-shadow: var(--shadow-card);
-  position: relative;
-  border: 1px solid hsl(var(--border));
-}
-
-/* тонкий верхний блик и внутренний контур */
-.glass::before {
-  content:""; 
-  position:absolute; 
-  inset:0; 
-  pointer-events:none; 
-  border-radius: inherit;
-  background: linear-gradient(180deg, rgb(255 255 255 / .18), transparent 35%);
-  mix-blend-mode: screen;
-}
-.glass::after {
-  content:""; 
-  position:absolute; 
-  inset:1px; 
-  border-radius: inherit; 
-  pointer-events:none;
-  outline: 1px solid rgb(255 255 255 / .06);
-  outline-offset: -1px;
-}
-
-.timer-card {
-  padding: 1rem;
-transition: all .3s var(--ease-smooth); }
-
-.timer-display {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  font-variant-numeric: tabular-nums; /* ✅ Одинаковая ширина цифр */
-  font-feature-settings: "tnum"; /* ✅ Дополнительная поддержка */
-  text-align: center; /* ✅ Стабильное центрирование */
-  letter-spacing: -0.02em; /* ✅ Улучшенное визуальное выравнивание */
-  min-width: 0; /* ✅ Предотвращает сжатие */
-  flex-shrink: 0; /* ✅ Запрещает уменьшение ширины */
-}
-
-.timer-card:hover {
-  box-shadow: var(--shadow-hover), 0 0 30px hsl(var(--primary)/.15);
-  transform: translateY(-2px);
-}
-
-
-  /* ---------- Alerts: system ---------- */
-  .alert{
-    --_bg-soft: hsl(var(--neutral) / var(--alpha-soft));
-    --_bd-soft: hsl(var(--neutral) / calc(var(--alpha-soft) + .16));
-    --_fg-soft: var(--neutral-fg-soft);
-
-    --_bg-solid: hsl(var(--neutral));
-    --_fg-solid: var(--neutral-fg-solid);
-    --_bd-solid: hsl(var(--neutral));
-
-    position: relative;
-    padding: 1rem 1.25rem 1.25rem;
-    border-radius: calc(var(--radius) - 4px);
-    border: 1px solid var(--_bd-soft);
-    background: var(--_bg-soft);
-    color: hsl(var(--_fg-soft));
-    box-shadow: 0 6px 20px -6px rgb(0 0 0 / .15);
-    overflow: hidden;
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    gap: .75rem .85rem;
-    align-items: start;
-    z-index: 2;
-    animation: alertIn .35s var(--ease-smooth);
-  }
-  .alert__icon{ inline-size: 1.25rem; block-size: 1.25rem; margin-top:.125rem; opacity:.9 }
-  .alert__title{ font-weight: 600; line-height: 1.25; }
-  .alert__desc{ font-size: .925rem; opacity: .9; grid-column: 2 / span 2; }
-
-  .alert-soft{ /* явный soft */ }
-  .alert-solid{
-    background: var(--_bg-solid);
-    color: hsl(var(--_fg-solid));
-    border-color: var(--_bd-solid);
-    box-shadow: 0 8px 26px -6px hsl(var(--_bg-solid) / .45);
-  }
-  .alert-outline{
-    background: transparent;
-    color: hsl(var(--_fg-soft));
-    border-color: hsl(var(--neutral) / var(--alpha-outline));
-    backdrop-filter: blur(10px);
-  }
-  .alert-ghost{
-    background: transparent;
-    border-color: transparent;
-    color: hsl(var(--_fg-soft));
-  }
-
-  /* Progress bar (toast life) */
-  .alert[data-progress]:after,
-  .alert-progress:after{
-    content:"";
-    position:absolute; left:0; right:auto; bottom:0; height:3px;
-    background: hsl(var(--_bg-solid));
-    width: 100%; transform-origin: left;
-    animation: alertBar var(--toast-duration, 5s) linear forwards;
-    opacity: .65;
-  }
-
-  /* Status bindings (aliases) */
-  .is-info, .alert-info{
-    --_bg-soft: hsl(var(--info)/var(--alpha-soft));
-    --_bd-soft: hsl(var(--info)/calc(var(--alpha-soft) + .16));
-    --_fg-soft: var(--info-fg-soft);
-    --_bg-solid: hsl(var(--info));
-    --_fg-solid: var(--info-fg-solid);
-    --_bd-solid: hsl(var(--info));
-  }
-  .is-success, .alert-success{
-    --_bg-soft: hsl(var(--success)/var(--alpha-soft));
-    --_bd-soft: hsl(var(--success)/calc(var(--alpha-soft) + .16));
-    --_fg-soft: var(--success-fg-soft);
-    --_bg-solid: hsl(var(--success));
-    --_fg-solid: var(--success-fg-solid);
-    --_bd-solid: hsl(var(--success));
-  }
-  .is-warning, .alert-warning{
-    --_bg-soft: hsl(var(--warning)/var(--alpha-soft));
-    --_bd-soft: hsl(var(--warning)/calc(var(--alpha-soft) + .16));
-    --_fg-soft: var(--warning-fg-soft);
-    --_bg-solid: hsl(var(--warning));
-    --_fg-solid: var(--warning-fg-solid);
-    --_bd-solid: hsl(var(--warning));
-  }
-  .is-error, .alert-error{
-    --_bg-soft: hsl(var(--error)/var(--alpha-soft));
-    --_bd-soft: hsl(var(--error)/calc(var(--alpha-soft) + .16));
-    --_fg-soft: var(--error-fg-soft);
-    --_bg-solid: hsl(var(--error));
-    --_fg-solid: var(--error-fg-solid);
-    --_bd-solid: hsl(var(--error));
-  }
-  .is-neutral, .alert-neutral{
-    --_bg-soft: hsl(var(--neutral)/var(--alpha-soft));
-    --_bd-soft: hsl(var(--neutral)/calc(var(--alpha-soft) + .16));
-    --_fg-soft: var(--neutral-fg-soft);
-    --_bg-solid: hsl(var(--neutral));
-    --_fg-solid: var(--neutral-fg-solid);
-    --_bd-solid: hsl(var(--neutral));
-  }
-
-  /* Toast stack */
-  .toast-stack{
-    position: fixed; top: 1rem; right: 1rem; z-index: 50;
-    display: grid; gap: .5rem; width: min(380px, 95vw);
-  }
-
-  @keyframes alertIn{ from{opacity:0; transform: translateY(8px) scale(.98)} to{opacity:1; transform: translateY(0) scale(1)} }
-  @keyframes alertBar{ from{ transform: scaleX(1)} to{ transform: scaleX(0)} }
-}
-/* ---------- Smooth theme transition ---------- */
-body, .glass, .btn-primary, .scramble-container {
-  transition: 
-    background-color .35s var(--ease-smooth),
-    color .35s var(--ease-smooth),
-    box-shadow .35s var(--ease-smooth),
-    text-shadow .35s var(--ease-smooth);
-}
-
-/* =======================================================================
-   THEME: NEON (Violet–Indigo–Cyan Glow)
-   - Глубокий фон с тремя неоновыми пятнами
-   - Усиленный glass + подсветки
-   - Светлый текст у soft-алертов, тёмный у solid
-======================================================================= */
-[data-theme="neon"] {
-  --background: 265 45% 7%;
-  --foreground: 270 80% 92%;
-
-  --card: 265 30% 12%;
-  --card-foreground: 270 80% 92%;
-
-  --primary: 280 100% 65%;
-  --primary-foreground: 0 0% 100%;
-
-  --secondary: 260 60% 20%;
-  --secondary-foreground: 0 0% 100%;
-
-  --muted: 265 35% 16%;
-  --muted-foreground: 270 70% 88%;
-
-  --accent: 260 100% 70%;
-  --accent-foreground: 0 0% 100%;
-
-  --destructive: 0 78% 54%;
-  --destructive-foreground: 0 0% 100%;
-
-  --border: 270 25% 28%;
-  --input: 265 30% 15%;
-  --ring: 280 100% 65%;
-
-  --alpha-soft: .18; /* чуть плотнее, чтобы читалось на тёмном */
-  --blur-card: 20px;
-
-  /* Status fg */
-  --info: 200 100% 60%;
-  --info-fg-soft: 200 100% 94%;
-  --info-fg-solid: 0 0% 8%;
-
-  --success: 150 85% 46%;
-  --success-fg-soft: 150 100% 92%;
-  --success-fg-solid: 0 0% 8%;
-
-  --warning: 45 100% 55%;
-  --warning-fg-soft: 52 100% 92%;
-  --warning-fg-solid: 0 0% 8%;
-
-  --error: 0 85% 60%;
-  --error-fg-soft: 0 100% 94%;
-  --error-fg-solid: 0 0% 8%;
-
-  --neutral: 265 18% 60%;
-  --neutral-fg-soft: 270 70% 92%;
-  --neutral-fg-solid: 0 0% 8%;
-
-  /* Multilayer background (violet → indigo → cyan) */
-  --gradient-bg:
-    radial-gradient(900px 650px at 25% 15%, hsl(285 90% 26% / .55), transparent 60%),
-    radial-gradient(1000px 700px at 80% 20%, hsl(260 80% 22% / .60), transparent 55%),
-    radial-gradient(800px 600px at 45% 100%, hsl(200 80% 20% / .45), transparent 60%),
-    linear-gradient(180deg, hsl(260 35% 8%), hsl(255 40% 6%));
-
-  --gradient-card: linear-gradient(145deg, hsl(265 40% 15% / .9), hsl(280 50% 10% / .7));
-  --gradient-button: linear-gradient(90deg, hsl(280 100% 65%), hsl(260 100% 60%));
-
-  --shadow-card: 0 0 22px hsl(280 100% 60% / .22), 0 0 42px hsl(260 100% 60% / .14);
-  --shadow-button: 0 0 20px hsl(280 100% 65% / .4), 0 0 40px hsl(260 100% 65% / .25);
-  --shadow-hover: 0 0 32px hsl(280 100% 70% / .5), 0 0 60px hsl(260 100% 70% / .3);
-
-  --noise-overlay: url("data:image/svg+xml;utf8,\
-<svg xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/></filter>\
-<rect width='100%' height='100%' filter='url(#n)' opacity='0.05'/></svg>");
-}
-
-/* Neon-specific component tweaks */
-@layer components {
-  [data-theme="neon"] .btn-primary{ box-shadow: var(--shadow-button); }
-  [data-theme="neon"] .btn-primary:hover{ box-shadow: var(--shadow-hover); transform: translateY(-2px) scale(1.02); }
-
-  [data-theme="neon"] .glass::before{
-    background: radial-gradient(250px 80px at 20% -10%, rgb(255 255 255 / .25), transparent 60%);
-    mix-blend-mode: screen;
-  }
-
-  /* Alerts keep same system; colors come from theme tokens */
-}
-
-/* =======================================================================
-   THEME: DARK (Luxury Black & Chrome)
-   - Графитовый фон с синеватым и бирюзовым переливами
-   - Холодный хром, строгие тени
-======================================================================= */
-[data-theme="dark"]{
-  --background: 0 0% 4%;
-  --foreground: 0 0% 96%;
-
-  --card: 0 0% 7%;
-  --card-foreground: 0 0% 96%;
-
-  --primary: 220 12% 55%;
-  --primary-foreground: 0 0% 100%;
-
-  --secondary: 0 0% 12%;
-  --secondary-foreground: 0 0% 96%;
-
-  --muted: 0 0% 15%;
-  --muted-foreground: 0 0% 75%;
-
-  --accent: 210 14% 22%;
-  --accent-foreground: 0 0% 96%;
-
-  --destructive: 0 78% 54%;
-  --destructive-foreground: 0 0% 100%;
-
-  --border: 0 0% 18%;
-  --input: 0 0% 14%;
-  --ring: 220 12% 65%;
-
-  --alpha-soft: .16;
-  --blur-card: 18px;
-
-  /* Status palette */
-  --info: 205 95% 62%;
-  --info-fg-soft: 200 100% 92%;
-  --info-fg-solid: 0 0% 8%;
-
-  --success: 150 60% 46%;
-  --success-fg-soft: 150 100% 92%;
-  --success-fg-solid: 0 0% 8%;
-
-  --warning: 42 100% 56%;
-  --warning-fg-soft: 48 100% 92%;
-  --warning-fg-solid: 0 0% 8%;
-
-  --error: 0 80% 60%;
-  --error-fg-soft: 0 100% 94%;
-  --error-fg-solid: 0 0% 8%;
-
-  --neutral: 220 10% 60%;
-  --neutral-fg-soft: 0 0% 94%;
-  --neutral-fg-solid: 0 0% 8%;
-
-  /* Multilayer background (graphite → midnight → teal) */
-  --gradient-bg:
-    radial-gradient(900px 700px at 20% 10%, hsl(220 25% 12% / .60), transparent 60%),
-    radial-gradient(900px 700px at 80% 20%, hsl(200 20% 10% / .55), transparent 55%),
-    radial-gradient(850px 600px at 50% 100%, hsl(260 15% 9% / .60), transparent 60%),
-    linear-gradient(180deg, hsl(0 0% 6%), hsl(0 0% 2%));
-
-  --gradient-card: linear-gradient(135deg, hsl(0 0% 8%), hsl(0 0% 14%));
-  --gradient-button: linear-gradient(135deg, hsl(0 0% 18%), hsl(0 0% 8%));
-
-  --shadow-card: 0 8px 28px -10px rgb(0 0 0 / .45), 0 4px 12px -6px rgb(0 0 0 / .25);
-  --shadow-button: 0 4px 18px -4px rgb(255 255 255 / .08), inset 0 0 6px rgb(255 255 255 / .05);
-  --shadow-hover: 0 0 20px rgb(210 210 210 / .22), 0 0 36px rgb(255 255 255 / .08);
-
-  --noise-overlay: url("data:image/svg+xml;utf8,\
-<svg xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.6'/></filter>\
-<rect width='100%' height='100%' filter='url(#n)' opacity='0.02'/></svg>");
 }
 
 @layer components {
-  [data-theme="dark"] .btn-primary{
-    color: var(--primary-foreground);
-    border: 1px solid hsl(0 0% 22%);
-    box-shadow: var(--shadow-button);
+  /* Timer display styles */
+  .timer-display {
+    font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
   }
-  [data-theme="dark"] .btn-primary:hover{
-    background: linear-gradient(135deg, hsl(0 0% 22%), hsl(0 0% 10%));
-    box-shadow: var(--shadow-hover);
-    transform: translateY(-2px);
+
+  .timer-ready {
+    color: hsl(var(--timer-ready));
+    text-shadow: var(--shadow-glow);
   }
-  [data-theme="dark"] .glass{
-    border: 1px solid hsl(0 0% 20% / .6);
+
+  .timer-running {
+    color: hsl(var(--timer-running));
   }
-  [data-theme="dark"] .glass::before{
-    background: linear-gradient(180deg, rgb(255 255 255 / .12), transparent 35%);
+
+  .timer-stopped {
+    color: hsl(var(--timer-stopped));
+  }
+
+  .timer-inspection {
+    color: hsl(var(--timer-inspection));
+  }
+
+  /* Card styles */
+  .timer-card {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    box-shadow: var(--shadow-card);
+    backdrop-filter: blur(8px);
+  }
+
+  /* Animations */
+  .pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% {
+      box-shadow: var(--shadow-card);
+    }
+    50% {
+      box-shadow: var(--shadow-timer);
+    }
+  }
+
+  /* Smooth transitions */
+  .transition-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
-
-/* =======================================================================
-   Helpers (если нужно быстро применить фон темы к body элемента)
-======================================================================= */
-.theme-bg{ background: var(--gradient-bg) fixed; }
-.theme-noise::after{ content:""; position:fixed; inset:0; background-image:var(--noise-overlay); pointer-events:none; }
-
-/* =======================================================================
-   Использование:
-   <div class="alert alert-info">…</div>                   // soft
-   <div class="alert alert-success alert-solid">…</div>    // solid
-   <div class="alert alert-warning alert-outline">…</div>  // outline
-   <div class="toast-stack"><div class="alert is-error alert-progress"></div></div>
-======================================================================= */
-
