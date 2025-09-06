@@ -15,13 +15,8 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          {/* Главная страница Mini App */}
-          <Route path="/miniapp/*" element={<NewIndex />} />
-
-          {/* Можно оставить "/" для локальной разработки */}
           <Route path="/" element={<NewIndex />} />
-
-          {/* Любой несуществующий маршрут */}
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
