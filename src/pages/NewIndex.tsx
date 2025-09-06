@@ -70,7 +70,6 @@ const timerSettings: TimerSettings = {
   const handleTimeRecord = (time: number) => {
     addTime(time, scramble);
     setScramble(generateEnhancedScramble(cubeType as any));
-    playStop();
     setToast({ message: 'Time recorded!', type: 'success' });
   };
 
@@ -195,7 +194,7 @@ return (
   >
 {toast && (
   <SwipeableToast
-    key={toast.id} // уникальный ключ, если будет несколько тостов
+    key={`${toast.message}-${Date.now()}`} // уникальный ключ, если будет несколько тостов
     message={toast.message}
     type={toast.type}
     duration={500}

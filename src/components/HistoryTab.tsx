@@ -189,29 +189,34 @@ export const HistoryTab = ({
                         </div>
                       </div>
                       
-<div className="flex gap-2"> {/* gap-2 вместо gap-1 */}
+<div className="flex gap-2 items-center">
   {!timeEntry.autoDnf && (
-    <button
-      onClick={(e) => { e.stopPropagation(); onPlusTwo(timeEntry.id); }}
-      className="px-3 py-1.5 text-sm rounded bg-blue-500/20 text-blue-400 border border-blue-500/30 hover:bg-blue-500/30 transition-colors font-medium"
-    >
-      {timeEntry.plusTwo ? '-2' : '+2'}
-    </button>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+          <MoreVertical className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => onPlusTwo(timeEntry.id)}>
+          <PlusTwo className="h-4 w-4 mr-2" />
+          {timeEntry.plusTwo ? 'Remove +2' : 'Add +2'}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onDNF(timeEntry.id)}>
+          <Ban className="h-4 w-4 mr-2" />
+          {timeEntry.dnf ? 'Remove DNF' : 'Add DNF'}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )}
-  {!timeEntry.autoDnf && (
-    <button
-      onClick={(e) => { e.stopPropagation(); onDNF(timeEntry.id); }}
-      className="px-3 py-1.5 text-sm rounded bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 transition-colors font-medium"
-    >
-      {timeEntry.dnf ? 'OK' : 'DNF'}
-    </button>
-  )}
-  <button
-    onClick={(e) => { e.stopPropagation(); onDelete(timeEntry.id); }}
-    className="px-3 py-1.5 text-sm rounded bg-muted-foreground/20 text-muted-foreground border border-muted-foreground/30 hover:bg-muted-foreground/30 transition-colors font-medium"
+  <Button
+    variant="ghost"
+    size="sm"
+    onClick={() => onDelete(timeEntry.id)}
+    className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
   >
-    ×
-  </button>
+    <Trash2 className="h-4 w-4" />
+  </Button>
 </div>
                     </Card>
                   );
