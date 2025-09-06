@@ -15,7 +15,7 @@ export const ScrambleDisplay = ({ cubeType, scramble, onScrambleChange }: Scramb
   const [copied, setCopied] = useState(false);
 
   const handleNewScramble = () => {
-    const newScramble = generateEnhancedScramble(cubeType);
+    const newScramble = generateEnhancedScramble(cubeType as any);
     onScrambleChange(newScramble);
     toast.success('New scramble generated!');
   };

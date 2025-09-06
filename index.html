@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Flip Timer</title>
@@ -13,15 +11,23 @@
     <meta property="og:title" content="Flip Timer - Professional Speedcubing Timer" />
     <meta property="og:description" content="A speedcubing timer." />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="///" />
+    <meta property="og:image" content="" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="///" />
-    <meta name="twitter:image" content="///" />
+    <meta name="twitter:site" content="" />
+    <meta name="twitter:image" content="" />
+
+    <!-- Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <!-- Стили приложения -->
+    <link rel="stylesheet" href="/static/index.css" />
   </head>
 
   <body>
     <div id="root"></div>
+
+    <!-- Основной React скрипт -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

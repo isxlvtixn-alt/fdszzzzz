@@ -9,47 +9,22 @@ interface SwipeableToastProps {
   onClose: () => void;
 }
 
-export const SwipeableToast = ({ 
-  message, 
-  type = 'success', 
-  duration = 2000, 
-  onClose 
+export const SwipeableToast = ({
+  message,
+  type = 'success',
+  duration = 1000,
+  onClose,
 }: SwipeableToastProps) => {
   const [isVisible, setIsVisible] = useState(true);
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragX, setDragX] = useState(0);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      handleClose();
-    }, duration);
-
+    const timer = setTimeout(() => handleClose(), duration);
     return () => clearTimeout(timer);
   }, [duration]);
 
   const handleClose = () => {
-    setIsVisible(false);
-    setTimeout(onClose, 300);
-  };
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setIsDragging(true);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging) return;
-    const touch = e.touches[0];
-    const startX = touch.clientX;
-    setDragX(startX);
-  };
-
-  const handleTouchEnd = () => {
-    if (Math.abs(dragX) > 100) {
-      handleClose();
-    } else {
-      setDragX(0);
-    }
-    setIsDragging(false);
+    setIsVisible(false); // проигрываем анимацию исчезновения
+    setTimeout(onClose, 300); // вызываем родителя только после анимации
   };
 
   const getTypeStyles = () => {
@@ -63,20 +38,13 @@ export const SwipeableToast = ({
     }
   };
 
-  if (!isVisible) return null;
-
   return (
-    <div className="fixed top-4 left-4 right-4 z-50 flex justify-center">
+    <div className="fixed top-4 left-4 right-4 z-50 flex justify-center pointer-events-none">
       <Card
-        className={`${getTypeStyles()} border-2 shadow-lg transition-all duration-300 ${
-          isVisible ? 'animate-in slide-in-from-top-2' : 'animate-out slide-out-to-top-2'
-        }`}
-        style={{ transform: `translateX(${dragX}px)` }}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
+        className={`pointer-events-auto ${getTypeStyles()} border-2 shadow-xl transition-transform duration-300
+          ${isVisible ? 'animate-in slide-in-from-top-2' : 'animate-out slide-out-to-top-2'}`}
       >
-        <div className="flex items-center justify-between p-4">
+        <div className="flex items-center justify-between p-4 min-w-[200px] max-w-[400px]">
           <span className="font-medium">{message}</span>
           <button
             onClick={handleClose}

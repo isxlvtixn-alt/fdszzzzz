@@ -23,8 +23,7 @@ export interface AppSettings {
   hideTime: boolean;
   inspection: boolean;
   inspectionTime: number;
-  sounds: boolean;
-  soundVolume: number;
+  scrambleView: '2D' | '3D';
 }
 
 export type TimerState = 'stopped' | 'inspection' | 'ready' | 'running';

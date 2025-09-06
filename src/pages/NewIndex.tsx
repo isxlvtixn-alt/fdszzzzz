@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTimerStore } from '@/store/timerStore';
 import { useTimer, TimerSettings } from '@/hooks/useTimer';
-import { useSound } from '@/hooks/useSound';
 import { generateEnhancedScramble } from '@/lib/enhanced-scramble-generator';
 import { MenuSettings } from '@/components/MenuSettings';
 import { TopBar } from '@/components/TopBar';
@@ -12,8 +11,9 @@ import { HistoryTab } from '@/components/HistoryTab';
 import { UniversalNavigation } from '@/components/UniversalNavigation';
 import { SwipeableToast } from '@/components/SwipeableToast';
 
+
 const BASE_HEIGHT = 730;
-const NAV_HEIGHT = 10;
+const NAV_HEIGHT = 2;
 
 const NewIndex = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -50,11 +50,10 @@ const NewIndex = () => {
   } = useTimerStore();
 
   const currentSession = getCurrentSession();
-  const { playStart, playStop, playInspection } = useSound(appSettings.sounds);
 
 const timerSettings: TimerSettings = {
   useInspection: appSettings.inspection,
-  inspectionTime: appSettings.inspectionTime,
+  inspectionTime: 15,
   stackmatMode: false,
   hideTimeWhileSolving: appSettings.hideTime, // если в hook ждёшь старое имя
 };
@@ -63,14 +62,14 @@ const timerSettings: TimerSettings = {
   const handleInspectionTimeout = () => {
     const time = 0; // DNF time
     addTime(time, scramble, true); // true for autoDnf
-    setScramble(generateEnhancedScramble(cubeType));
+    setScramble(generateEnhancedScramble(cubeType as any));
     setToast({ message: 'DNF - Inspection timeout', type: 'error' });
   };
 
   // Handle time recording
   const handleTimeRecord = (time: number) => {
     addTime(time, scramble);
-    setScramble(generateEnhancedScramble(cubeType));
+    setScramble(generateEnhancedScramble(cubeType as any));
     playStop();
     setToast({ message: 'Time recorded!', type: 'success' });
   };
@@ -84,7 +83,7 @@ const timerSettings: TimerSettings = {
       createSession(`${cubeType} Session`, cubeType);
     }
     if (!scramble) {
-      setScramble(generateEnhancedScramble(cubeType));
+      setScramble(generateEnhancedScramble(cubeType as any));
     }
   }, [sessions.length, scramble, cubeType, createSession, setScramble]);
 
@@ -179,45 +178,40 @@ const timerSettings: TimerSettings = {
 
   // Scramble generation when cube type changes
   useEffect(() => {
-    setScramble(generateEnhancedScramble(cubeType));
+    setScramble(generateEnhancedScramble(cubeType as any));
   }, [cubeType, setScramble]);
 
-  // Sound effects
-  useEffect(() => {
-    if (state === 'running') playStart();
-    else if (state === 'inspection') playInspection();
-  }, [state, playStart, playInspection]);
 
   // Theme handling
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', appSettings.theme);
   }, [appSettings.theme]);
 
-  return (
+return (
 <div className="min-h-screen w-screen grid grid-rows-[1fr_auto] overflow-hidden">
   <div
     ref={containerRef}
-    className="overflow-hidden relative pb-12" // pb-12 для места под нижнюю панель
+    className="overflow-hidden relative"
   >
-    {toast && (
-      <SwipeableToast
-        message={toast.message}
-        type={toast.type}
-        duration={2000}
-        onClose={() => setToast(null)}
-      />
-    )}
+{toast && (
+  <SwipeableToast
+    key={toast.id} // уникальный ключ, если будет несколько тостов
+    message={toast.message}
+    type={toast.type}
+    duration={500}
+    onClose={() => setToast(null)} // вызов произойдет после анимации
+  />
+)}
 
     {activeTab === 'timer' ? (
       <div className="flex flex-col h-full overflow-hidden">
         {/* Top panel */}
-        <div className="flex items-center justify-between border-b border-border/50 p-4">
+        <div className="container-frame-subtle flex items-center justify-between p-4">
           <MenuSettings
             settings={{
               inspection: appSettings.inspection,
-              inspectionTime: appSettings.inspectionTime,
+              inspectionTime: 15,
               hideTime: appSettings.hideTime,
-              sounds: appSettings.sounds,
               scrambleView: appSettings.scrambleView,
               theme: appSettings.theme,
             }}
@@ -230,8 +224,9 @@ const timerSettings: TimerSettings = {
         <TopBar
           scramble={scramble}
           cubeType={cubeType}
-          onNewScramble={() => setScramble(generateEnhancedScramble(cubeType))}
+          onNewScramble={() => setScramble(generateEnhancedScramble(cubeType as any))}
           onCubeTypeChange={setCubeType}
+          onCustomScramble={setScramble}
           disabled={isAnyWindowOpen}
         />
 
@@ -263,7 +258,8 @@ const timerSettings: TimerSettings = {
         </div>
 
         {/* Bottom panel */}
-        <div className="border-t border-border/50 bg-card/30">
+        <div className="container-frame-subtle">
+          <div className="section-divider mb-3"></div>
           <div className="flex items-center justify-between p-3 h-17 overflow-hidden">
             <div className="w-20">
               <BottomStats times={currentSession?.times ?? []} />
@@ -272,11 +268,11 @@ const timerSettings: TimerSettings = {
               <BottomVisualization
                 scramble={scramble}
                 cubeType={cubeType}
-                viewMode={appSettings.scrambleView as '2D' | '3D'}
+                viewMode={appSettings.scrambleView}
                 disabled={isAnyWindowOpen}
               />
             </div>
-            <div className="w-20 text-right text-xs text-muted-foreground">
+            <div className="w-20 text-right text-sm text-muted-foreground">
               <div className="font-medium truncate">{currentSession?.name}</div>
               <div>{currentSession?.times.length || 0} solves</div>
             </div>

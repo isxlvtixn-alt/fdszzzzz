@@ -88,10 +88,6 @@ export const MainTimer: React.FC<MainTimerProps> = ({
         >
           {displayTime}
         </div>
-
-        <div className="text-muted-foreground text-sm md:text-base mt-4 text-center pointer-events-none">
-          Press SPACE or TAP to start
-        </div>
       </div>
 
       {/* Timer Actions - overlay on top */}
