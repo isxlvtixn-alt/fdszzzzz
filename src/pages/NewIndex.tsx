@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTimerStore } from '@/store/timerStore';
 import { useTimer, TimerSettings } from '@/hooks/useTimer';
+import { useSound } from '@/hooks/useSound';
 import { generateEnhancedScramble } from '@/lib/enhanced-scramble-generator';
 import { MenuSettings } from '@/components/MenuSettings';
 import { TopBar } from '@/components/TopBar';
@@ -11,9 +12,8 @@ import { HistoryTab } from '@/components/HistoryTab';
 import { UniversalNavigation } from '@/components/UniversalNavigation';
 import { SwipeableToast } from '@/components/SwipeableToast';
 
-
 const BASE_HEIGHT = 730;
-const NAV_HEIGHT = 2;
+const NAV_HEIGHT = 10;
 
 const NewIndex = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -50,10 +50,11 @@ const NewIndex = () => {
   } = useTimerStore();
 
   const currentSession = getCurrentSession();
+  const { playStart, playStop, playInspection } = useSound(appSettings.sounds);
 
 const timerSettings: TimerSettings = {
   useInspection: appSettings.inspection,
-  inspectionTime: 15,
+  inspectionTime: appSettings.inspectionTime,
   stackmatMode: false,
   hideTimeWhileSolving: appSettings.hideTime, // если в hook ждёшь старое имя
 };
@@ -181,27 +182,31 @@ const timerSettings: TimerSettings = {
     setScramble(generateEnhancedScramble(cubeType as any));
   }, [cubeType, setScramble]);
 
+  // Sound effects
+  useEffect(() => {
+    if (state === 'running') playStart();
+    else if (state === 'inspection') playInspection();
+  }, [state, playStart, playInspection]);
 
   // Theme handling
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', appSettings.theme);
   }, [appSettings.theme]);
 
-return (
+  return (
 <div className="min-h-screen w-screen grid grid-rows-[1fr_auto] overflow-hidden">
   <div
     ref={containerRef}
-    className="overflow-hidden relative"
+    className="overflow-hidden relative pb-12" // pb-12 для места под нижнюю панель
   >
-{toast && (
-  <SwipeableToast
-    key={toast.id} // уникальный ключ, если будет несколько тостов
-    message={toast.message}
-    type={toast.type}
-    duration={500}
-    onClose={() => setToast(null)} // вызов произойдет после анимации
-  />
-)}
+    {toast && (
+      <SwipeableToast
+        message={toast.message}
+        type={toast.type}
+        duration={2000}
+        onClose={() => setToast(null)}
+      />
+    )}
 
     {activeTab === 'timer' ? (
       <div className="flex flex-col h-full overflow-hidden">
@@ -210,8 +215,9 @@ return (
           <MenuSettings
             settings={{
               inspection: appSettings.inspection,
-              inspectionTime: 15,
+              inspectionTime: appSettings.inspectionTime,
               hideTime: appSettings.hideTime,
+              sounds: appSettings.sounds,
               scrambleView: appSettings.scrambleView,
               theme: appSettings.theme,
             }}
@@ -272,7 +278,7 @@ return (
                 disabled={isAnyWindowOpen}
               />
             </div>
-            <div className="w-20 text-right text-sm text-muted-foreground">
+            <div className="w-20 text-right text-xs text-muted-foreground">
               <div className="font-medium truncate">{currentSession?.name}</div>
               <div>{currentSession?.times.length || 0} solves</div>
             </div>

@@ -4,12 +4,13 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Menu } from 'lucide-react';
+import { Menu, Palette, Eye, Volume2, Box } from 'lucide-react';
 
 interface AppSettings {
   inspection: boolean;
   inspectionTime: number;
-  hideTime: boolean;
+  hideTime: boolean;   // <-- единое название
+  sounds: boolean;
   scrambleView: '2D' | '3D';
   theme: string;
 }
@@ -41,25 +42,23 @@ export const MenuSettings = ({ settings, onSettingsChange, disabled, onOpenChang
           <Menu className="h-4 w-4" />
         </Button>
       </SheetTrigger>
-
-      <SheetContent side="left" className="w-80 p-0">
-        <div className="flex flex-col h-full">
-          {/* Header */}
-          <SheetHeader className="px-4 py-3 border-b">
-            <SheetTitle className="flex items-center gap-2 text-lg">
-              <Menu className="h-5 w-5" />
-              Settings
-            </SheetTitle>
-          </SheetHeader>
-
-          {/* Scrollable content */}
-          <div className="flex-1 overflow-y-auto px-4 py-6 space-y-8">
-            {/* Timer */}
-            <div className="space-y-4">
-              <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Timer
-              </h3>
-
+      <SheetContent side="left" className="w-80">
+        <SheetHeader>
+          <SheetTitle className="flex items-center gap-2">
+            <Menu className="h-5 w-5" />
+            Settings
+          </SheetTitle>
+        </SheetHeader>
+        
+        <div className="space-y-6 mt-6">
+          {/* Timer Settings */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Eye className="h-4 w-4" />
+              <h3 className="font-semibold">Timer</h3>
+            </div>
+            
+            <div className="space-y-3 pl-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label htmlFor="inspection">Inspection Time</Label>
@@ -68,23 +67,34 @@ export const MenuSettings = ({ settings, onSettingsChange, disabled, onOpenChang
                   </p>
                 </div>
                 <Switch
-  id="inspection"
-  checked={settings.inspection}
-  onCheckedChange={(checked) =>
-    onSettingsChange({
-      inspection: checked,
-      inspectionTime: 15, // всегда фиксированное значение
-    })
-  }
-/>
- </div>
-{settings.inspection && (
-  <div className="space-y-2">
-    <Label>Inspection Duration</Label>
-    <div className="text-sm text-muted-foreground">15 seconds</div>
-  </div>
-)}
+                  id="inspection"
+                  checked={settings.inspection}
+                  onCheckedChange={(checked) => 
+                    onSettingsChange({ inspection: checked })
+                  }
+                />
+              </div>
 
+              {settings.inspection && (
+                <div className="space-y-2">
+                  <Label>Inspection Duration</Label>
+                  <Select
+                    value={settings.inspectionTime.toString()}
+                    onValueChange={(value) => 
+                      onSettingsChange({ inspectionTime: parseInt(value) })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="8">8 seconds</SelectItem>
+                      <SelectItem value="15">15 seconds</SelectItem>
+                      <SelectItem value="30">30 seconds</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
@@ -102,13 +112,42 @@ export const MenuSettings = ({ settings, onSettingsChange, disabled, onOpenChang
                 />
               </div>
             </div>
+          </div>
 
-            {/* Visualization */}
-            <div className="space-y-4">
-              <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Scramble Visualization
-              </h3>
+          {/* Audio Settings */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Volume2 className="h-4 w-4" />
+              <h3 className="font-semibold">Audio</h3>
+            </div>
+            
+            <div className="pl-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="sounds">Enable Sounds</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Play sounds for timer events
+                  </p>
+                </div>
+                <Switch
+                  id="sounds"
+                  checked={settings.sounds}
+                  onCheckedChange={(checked) => 
+                    onSettingsChange({ sounds: checked })
+                  }
+                />
+              </div>
+            </div>
+          </div>
 
+          {/* Visualization Settings */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Box className="h-4 w-4" />
+              <h3 className="font-semibold">Scramble Visualization</h3>
+            </div>
+            
+            <div className="pl-6">
               <div className="space-y-2">
                 <Label>View Mode</Label>
                 <Select
@@ -127,13 +166,16 @@ export const MenuSettings = ({ settings, onSettingsChange, disabled, onOpenChang
                 </Select>
               </div>
             </div>
+          </div>
 
-            {/* Appearance */}
-            <div className="space-y-4">
-              <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                Appearance
-              </h3>
-
+          {/* Theme Settings */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Palette className="h-4 w-4" />
+              <h3 className="font-semibold">Appearance</h3>
+            </div>
+            
+            <div className="pl-6">
               <div className="space-y-2">
                 <Label>Theme</Label>
                 <Select
@@ -146,9 +188,10 @@ export const MenuSettings = ({ settings, onSettingsChange, disabled, onOpenChang
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="light">Light</SelectItem>
-                    <SelectItem value="dark">Dark</SelectItem>
-                    <SelectItem value="neon">Neon</SelectItem>
+                    <SelectItem value="blue">Blue</SelectItem>
+                    <SelectItem value="green">Green</SelectItem>
+                    <SelectItem value="pink">Pink</SelectItem>
+                    <SelectItem value="amber">Amber</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

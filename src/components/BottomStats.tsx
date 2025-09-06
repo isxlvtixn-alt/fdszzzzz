@@ -65,7 +65,7 @@ export const BottomStats = ({ times }: BottomStatsProps) => {
   }, [times]);
 
   return (
-    <div className="space-y-1 text-sm">
+    <div className="space-y-2 text-xs">
       <div className="flex items-center justify-between">
         <span className="text-muted-foreground">Last:</span>
         <span className="font-mono">{stats.current}</span>
