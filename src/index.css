@@ -202,7 +202,6 @@
 }
 
 [data-theme="dark"] [role="menu"],
-[data-theme="dark"] [role="combobox"],
 [data-theme="dark"] [data-radix-select-content],
 [data-theme="dark"] [data-radix-dropdown-menu-content] {
   background: linear-gradient(145deg, hsl(0 0% 12% / .95), hsl(0 0% 8% / .9)) !important;
@@ -217,37 +216,19 @@
 }
 
 [data-theme="dark"] [role="menuitem"],
-[data-theme="dark"] [role="combobox"],
 [data-theme="dark"] [data-radix-select-item],
 [data-theme="dark"] [data-radix-dropdown-menu-item] {
   color: hsl(0 0% 90%) !important;
 }
 
 [data-theme="dark"] [role="menuitem"]:hover,
-[data-theme="dark"] [role="combobox"]:hover,
 [data-theme="dark"] [data-radix-select-item]:hover,
 [data-theme="dark"] [data-radix-dropdown-menu-item]:hover,
 [data-theme="dark"] [role="menuitem"][data-highlighted],
-[data-theme="dark"] [role="combobox"][data-highlighted],
 [data-theme="dark"] [data-radix-select-item][data-highlighted],
 [data-theme="dark"] [data-radix-dropdown-menu-item][data-highlighted] {
   background: hsl(0 0% 18% / .8) !important;
   color: hsl(0 0% 100%) !important;
-}
-
-/* Dark theme select triggers and values */
-[data-theme="dark"] [data-radix-select-trigger],
-[data-theme="dark"] [data-radix-select-value] {
-  background: linear-gradient(145deg, hsl(0 0% 12% / .7), hsl(0 0% 8% / .6)) !important;
-  border: 1px solid hsl(0 0% 25% / .3) !important;
-  color: hsl(0 0% 90%) !important;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-[data-theme="dark"] [data-radix-select-trigger]:hover {
-  background: linear-gradient(145deg, hsl(0 0% 15% / .8), hsl(0 0% 10% / .7)) !important;
-  border-color: hsl(0 0% 30% / .5) !important;
 }
 
 /* Neon Theme Dropdowns */
@@ -256,7 +237,6 @@
 }
 
 [data-theme="neon"] [role="menu"],
-[data-theme="neon"] [role="combobox"],
 [data-theme="neon"] [data-radix-select-content],
 [data-theme="neon"] [data-radix-dropdown-menu-content] {
   background: linear-gradient(145deg, hsl(265 40% 15% / .95), hsl(280 50% 10% / .9)) !important;
@@ -271,39 +251,20 @@
 }
 
 [data-theme="neon"] [role="menuitem"],
-[data-theme="neon"] [role="combobox"],
 [data-theme="neon"] [data-radix-select-item],
 [data-theme="neon"] [data-radix-dropdown-menu-item] {
   color: hsl(270 70% 88%) !important;
 }
 
 [data-theme="neon"] [role="menuitem"]:hover,
-[data-theme="neon"] [role="combobox"]:hover,
 [data-theme="neon"] [data-radix-select-item]:hover,
 [data-theme="neon"] [data-radix-dropdown-menu-item]:hover,
 [data-theme="neon"] [role="menuitem"][data-highlighted],
-[data-theme="neon"] [role="combobox"][data-highlighted],
 [data-theme="neon"] [data-radix-select-item][data-highlighted],
 [data-theme="neon"] [data-radix-dropdown-menu-item][data-highlighted] {
   background: hsl(280 60% 20% / .8) !important;
   color: hsl(280 100% 95%) !important;
   text-shadow: 0 0 8px hsl(280 100% 65% / .6);
-}
-
-/* Neon theme select triggers and values */
-[data-theme="neon"] [data-radix-select-trigger],
-[data-theme="neon"] [data-radix-select-value] {
-  background: linear-gradient(145deg, hsl(265 40% 15% / .7), hsl(280 50% 10% / .6)) !important;
-  border: 1px solid hsl(280 100% 65% / .3) !important;
-  color: hsl(270 70% 88%) !important;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-[data-theme="neon"] [data-radix-select-trigger]:hover {
-  background: linear-gradient(145deg, hsl(265 40% 18% / .8), hsl(280 50% 12% / .7)) !important;
-  border-color: hsl(280 100% 65% / .5) !important;
-  box-shadow: 0 0 15px hsl(280 100% 60% / .3);
 }
 
 /* тонкий верхний блик и внутренний контур */
