@@ -92,7 +92,7 @@ export const useTimer = (
 
       if (settings.useInspection) {
         setCurrentState("inspection");
-        setInspectionTime(15 * 1000);
+        setInspectionTime(settings.inspectionTime * 1000);
         inspectionStartRef.current = now;
       } else {
         setCurrentState("running");
