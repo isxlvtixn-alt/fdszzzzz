@@ -41,12 +41,10 @@ interface TimerStore {
 }
 
 const DEFAULT_SETTINGS: AppSettings = {
-  theme: 'dark',
+  theme: 'light',
   hideTime: false,
   inspection: false,
   inspectionTime: 15,
-  sounds: false,
-  soundVolume: 0.5,
   scrambleView: '2D',
 };
 
